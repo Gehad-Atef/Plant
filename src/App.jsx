@@ -1,17 +1,18 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
+
 import HomePage from "./components/HomePage";
-import Login from "./components/Login";
-import SignUp from "./components/SignUp";
+import Login from "./components/Authentication/Login";
+import SignUp from "./components/Authentication/SignUp";
 import AboutUs from "./components/AboutUs";
 import ContactUs from "./components/ContactUs";
 import ProfileCard from "./components/Profile";
+import VerifyEmail from "./components/Authentication/VerifyEmail";
+import ChangePassword from "./components/Authentication/ChangePassword";
 
 function App() {
   return (
     <Router>
       <div className="bg-gray-100 min-h-screen">
-        <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login />} />
@@ -19,6 +20,8 @@ function App() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/profile" element={<ProfileCard />} />
+          <Route path="/email" element={<VerifyEmail />} />
+          <Route path="/changePass" element={<ChangePassword />} />
         </Routes>
       </div>
     </Router>

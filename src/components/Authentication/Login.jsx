@@ -47,8 +47,8 @@ const Login = () => {
 
             <div className="flex items-center justify-between mt-4">
               <a
-                href="#"
-                className="text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-400"
+                href="email"
+                className="text-sm text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-400"
               >
                 Forget Password?
               </a>

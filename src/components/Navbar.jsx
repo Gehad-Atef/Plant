@@ -21,6 +21,9 @@ const Navbar = () => {
         <Link to="/community" className="hover:text-green-600">
           Community
         </Link>
+        <Link to="/contact" className="hover:text-green-600">
+          Contact Us
+        </Link>
       </div>
       <div className="flex items-center space-x-6 mr-24">
         <button className="bg-green-400 px-4 py-2 rounded-full flex items-center text-white hover:bg-green-600">

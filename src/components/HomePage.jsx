@@ -1,10 +1,12 @@
 import lavenderImage from "../assets/Images/Lavende.png";
 import lewisiaImage from "../assets/Images/Lewisia.png";
 import plantImage from "../assets/Images/image.png";
+import Navbar from "./Navbar";
 
 const PlantShop = () => {
   return (
     <div className="bg-gradient-to-r from-green-200 to-white min-h-screen font-sans">
+      <Navbar />
       {/* Hero Section */}
       <header className="px-10 py-16 flex flex-col md:flex-row items-center justify-center text-center md:text-left">
         <div className="max-w-xl">
