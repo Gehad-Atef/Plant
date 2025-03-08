@@ -1,89 +1,134 @@
-import { useNavigate } from "react-router-dom";
-import { FaTimes } from "react-icons/fa";
+import { useState } from "react";
+import { User, Mail, Lock, Loader2 } from "lucide-react";
+import { useRegister } from "../../hooks/authService";
 
 const SignUp = () => {
-  const navigate = useNavigate();
+  const { mutate: register, isLoading, error } = useRegister();
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (formData.password !== formData.confirmPassword)
+      return alert("Passwords do not match!");
+    register({
+      UserName: formData.username,
+      Email: formData.email,
+      Password: formData.password,
+    });
+  };
+
   return (
-    <div className="flex items-center justify-center h-screen bg-gradient-to-b from-gray-700 via-green-400 to-green-100 dark:from-gray-900 dark:via-gray-700 dark:to-gray-800">
-      <div className="relative w-full max-w-sm mx-auto overflow-hidden bg-white/40 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg">
+    <div className="text-center">
+      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-200">
+        Create Account
+      </h2>
+      {error && (
+        <p className="text-red-500 text-sm mt-2">
+          {error.response?.data?.message || "Registration failed!"}
+        </p>
+      )}
+
+      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        {/* Username */}
+        <div className="relative">
+          <User
+            className="absolute left-3 top-3 text-gray-500 dark:text-gray-400"
+            size={18}
+          />
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={formData.username}
+            onChange={handleChange}
+            className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-green-500 dark:bg-gray-900 dark:text-gray-300"
+            required
+          />
+        </div>
+
+        {/* Email */}
+        <div className="relative">
+          <Mail
+            className="absolute left-3 top-3 text-gray-500 dark:text-gray-400"
+            size={18}
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email Address"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-green-500 dark:bg-gray-900 dark:text-gray-300"
+            required
+          />
+        </div>
+
+        {/* Password */}
+        <div className="relative">
+          <Lock
+            className="absolute left-3 top-3 text-gray-500 dark:text-gray-400"
+            size={18}
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-green-500 dark:bg-gray-900 dark:text-gray-300"
+            required
+          />
+        </div>
+
+        {/* Confirm Password */}
+        <div className="relative">
+          <Lock
+            className="absolute left-3 top-3 text-gray-500 dark:text-gray-400"
+            size={18}
+          />
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-green-500 dark:bg-gray-900 dark:text-gray-300"
+            required
+          />
+        </div>
+
+        {/* Sign Up Button */}
         <button
-          onClick={() => navigate("/")}
-          className="absolute top-3 right-3 text-gray-700 dark:text-gray-300 hover:text-red-500 transition-colors duration-200"
+          type="submit"
+          disabled={isLoading}
+          className="w-full py-3 rounded-lg bg-green-700 text-white hover:bg-green-800 transition"
         >
-          <FaTimes size={20} />
+          {isLoading ? (
+            <Loader2 className="animate-spin mx-auto" size={20} />
+          ) : (
+            "Sign Up"
+          )}
         </button>
+      </form>
 
-        <div className="px-6 py-6">
-          <form className="w-full max-w-md">
-            {/* اللوجو */}
-            <div className="flex justify-center mx-auto">
-              <img
-                className="w-auto h-7 sm:h-8 mt-4"
-                src="https://merakiui.com/images/logo.svg"
-                alt="Logo"
-              />
-            </div>
-
-            <div className="flex items-center justify-center mt-6 font-bold text-gray-900 dark:text-gray-200">
-              Create Account
-            </div>
-
-            <div className="relative flex items-center mt-8 w-full">
-              <input
-                type="text"
-                className="block w-full px-4 py-3 text-gray-700 dark:text-gray-300 bg-white border rounded-lg dark:bg-gray-900 dark:border-gray-600 focus:border-green-500 focus:ring focus:ring-green-300 focus:outline-none"
-                placeholder="Username"
-              />
-            </div>
-
-            <div className="w-full mt-4">
-              <input
-                className="block w-full px-4 py-3 text-gray-700 dark:text-gray-300 bg-white border rounded-lg dark:bg-gray-900 dark:border-gray-600 focus:border-green-500 focus:ring focus:ring-green-300 focus:outline-none"
-                type="email"
-                placeholder="Email Address"
-                aria-label="Email Address"
-              />
-            </div>
-
-            <div className="w-full mt-4">
-              <input
-                className="block w-full px-4 py-3 text-gray-700 dark:text-gray-300 bg-white border rounded-lg dark:bg-gray-900 dark:border-gray-600 focus:border-green-500 focus:ring focus:ring-green-300 focus:outline-none"
-                type="password"
-                placeholder="Password"
-                aria-label="Password"
-              />
-            </div>
-
-            <div className="w-full mt-4">
-              <input
-                className="block w-full px-4 py-3 text-gray-700 dark:text-gray-300 bg-white border rounded-lg dark:bg-gray-900 dark:border-gray-600 focus:border-green-500 focus:ring focus:ring-green-300 focus:outline-none"
-                type="password"
-                placeholder="Confirm Password"
-                aria-label="Confirm Password"
-              />
-            </div>
-
-            <div className="mt-6">
-              <button className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white bg-green-700 dark:bg-green-600 rounded-lg hover:bg-green-600 dark:hover:bg-green-500 focus:outline-none focus:ring focus:ring-green-300">
-                Sign Up
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div className="flex items-center justify-center py-4 text-center bg-white/30 dark:bg-gray-700/70 rounded-b-2xl">
-          <span className="text-sm text-gray-800 dark:text-gray-300">
-            Already have an account?
-          </span>
-
-          <a
-            href="Login"
-            className="ml-2 text-sm font-bold text-green-700 dark:text-green-400 hover:underline"
-          >
-            Login
-          </a>
-        </div>
-      </div>
+      {/* Redirect to Login */}
+      <p className="mt-4 text-sm text-gray-700 dark:text-gray-300">
+        Already have an account?{" "}
+        <a
+          href="/login"
+          className="text-green-700 dark:text-green-400 font-bold hover:underline"
+        >
+          Login
+        </a>
+      </p>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import AboutImage from "../assets/Images/About.png";
 import { FaCheckCircle } from "react-icons/fa";
-import Navbar from "./Navbar";
 
+// About Page Features
 const aboutArray = [
   {
     title: "Plant Care Guides",
@@ -38,12 +38,11 @@ const aboutArray = [
 const AboutUs = () => {
   return (
     <div className="bg-gradient-to-r from-green-200 to-white min-h-screen flex flex-col">
-      {/* ✅ Navbar added */}
-      <Navbar />
-
-      <div className="flex flex-col md:flex-row items-center md:items-start px-10 pt-5 flex-grow">
-        <div className="w-full md:min-w-2/3 min-h-screen pl-5 pr-5 md:pl-10 md:pr-16 font-serif flex flex-col items-center md:items-start">
-          <div className="w-full md:w-auto text-center md:text-left">
+      {/* ✅ Hero Section */}
+      <section className="flex flex-col md:flex-row items-center px-10 pt-5 flex-grow">
+        {/* ✅ About Text */}
+        <div className="w-full md:w-2/3 px-5 md:px-10 font-serif flex flex-col items-center md:items-start">
+          <div className="text-center md:text-left">
             <h3 className="text-[#82C357] text-[20px] md:text-[25px] font-bold">
               About Us
             </h3>
@@ -59,25 +58,21 @@ const AboutUs = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 h-auto md:w-full md:pt-10 pb-10 text-center md:text-left md:grid-cols-2 md:grid-rows-3">
-            {aboutArray.map((item) => (
-              <div className="p-3 relative" key={item.title}>
-                <FaCheckCircle className="absolute text-[25px] left-1/2 text-[#82C357] mt-1 text-center md:left-0" />
-                <div className="ml-7 mt-6 md:mt-0">
-                  <h3 className="text-[20px] md:text-[22px] text-[#2C3B23] font-bold">
-                    {item.title}
-                  </h3>
-                  <p className="text-zinc-500 text-[16px] md:text-[18px]">
-                    {item.description}
-                  </p>
-                </div>
-              </div>
+          {/* ✅ About Features */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-10 text-center md:text-left">
+            {aboutArray.map((item, index) => (
+              <FeatureItem
+                key={index}
+                title={item.title}
+                description={item.description}
+              />
             ))}
           </div>
         </div>
 
-        <div className="hidden md:flex min-w-[250px] lg:flex lg:min-w-[300px] relative justify-center">
-          <div className="relative w-full h-[200px] md:h-[300px] rounded-[80px] md:rounded-[50px] overflow-hidden shadow-[20px_20px_0px_0px_rgba(201,249,170,0.7)] z-10">
+        {/* ✅ About Image */}
+        <div className="hidden md:flex min-w-[250px] lg:min-w-[300px] justify-center">
+          <div className="relative w-full h-[200px] md:h-[300px] rounded-[50px] overflow-hidden shadow-[20px_20px_0px_0px_rgba(201,249,170,0.7)]">
             <img
               src={AboutImage}
               alt="About Us"
@@ -85,6 +80,23 @@ const AboutUs = () => {
             />
           </div>
         </div>
+      </section>
+    </div>
+  );
+};
+
+// ✅ Extracted FeatureItem Component
+const FeatureItem = ({ title, description }) => {
+  return (
+    <div className="p-3 relative flex flex-col items-center md:items-start">
+      <FaCheckCircle className="text-[25px] text-[#82C357] absolute md:static top-1 md:left-0" />
+      <div className="ml-7 mt-6 md:mt-0">
+        <h3 className="text-[20px] md:text-[22px] text-[#2C3B23] font-bold">
+          {title}
+        </h3>
+        <p className="text-zinc-500 text-[16px] md:text-[18px]">
+          {description}
+        </p>
       </div>
     </div>
   );

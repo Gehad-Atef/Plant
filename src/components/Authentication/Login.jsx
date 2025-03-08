@@ -1,78 +1,96 @@
-import { useNavigate } from "react-router-dom";
-import { FaTimes } from "react-icons/fa";
+import { useState } from "react";
+import { Mail, Lock, Loader2 } from "lucide-react";
+import { useLogin } from "../../hooks/authService";
 
 const Login = () => {
-  const navigate = useNavigate();
+  const { mutate: login, isLoading, error } = useLogin(); // Login mutation hook
+  const [email, setEmail] = useState("aya.123.aly.5@gmail.com");
+  const [password, setPassword] = useState("Aa123456*");
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    login({ email, password });
+  };
+
   return (
-    <div className="flex items-center justify-center h-screen bg-gradient-to-b from-gray-700 via-green-400 to-green-100 dark:from-gray-900 dark:via-gray-700 dark:to-gray-800">
-      <div className="relative w-full max-w-sm mx-auto overflow-hidden bg-white/40 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg">
-        <button
-          onClick={() => navigate("/")}
-          className="absolute top-3 right-3 text-gray-700 dark:text-gray-300 hover:text-red-500 transition-colors duration-200"
-        >
-          <FaTimes size={20} />
-        </button>
-
-        <div className="px-6 py-6">
-          <div className="flex justify-center">
-            <img
-              className="w-auto h-10"
-              src="https://merakiui.com/images/logo.svg"
-              alt="Logo"
-            />
-          </div>
-
-          <p className="mt-4 mb-6 text-center font-bold text-gray-900 dark:text-gray-200 text-lg">
-            Login
-          </p>
-
-          <form>
-            <div className="w-full">
-              <input
-                className="block w-full px-4 py-3 mt-2 text-gray-700 dark:text-gray-300 bg-white border rounded-lg dark:bg-gray-900 dark:border-gray-600 focus:border-green-500 focus:ring focus:ring-green-300 focus:outline-none"
-                type="email"
-                placeholder="Email Address"
-                aria-label="Email Address"
-              />
-            </div>
-
-            <div className="w-full mt-4">
-              <input
-                className="block w-full px-4 py-3 text-gray-700 dark:text-gray-300 bg-white border rounded-lg dark:bg-gray-900 dark:border-gray-600 focus:border-green-500 focus:ring focus:ring-green-300 focus:outline-none"
-                type="password"
-                placeholder="Password"
-                aria-label="Password"
-              />
-            </div>
-
-            <div className="flex items-center justify-between mt-4">
-              <a
-                href="email"
-                className="text-sm text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-400"
-              >
-                Forget Password?
-              </a>
-
-              <button className="px-6 py-2 text-sm font-medium text-white bg-green-700 dark:bg-green-600 rounded-lg hover:bg-green-600 dark:hover:bg-green-500 focus:outline-none focus:ring focus:ring-green-300">
-                Sign In
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div className="flex items-center justify-center py-4 text-center bg-white/30 dark:bg-gray-700/70 rounded-b-2xl">
-          <span className="text-sm text-gray-800 dark:text-gray-300">
-            Don’t have an account?
-          </span>
-
-          <a
-            href="SignUp"
-            className="ml-2 text-sm font-bold text-green-700 dark:text-green-400 hover:underline"
-          >
-            Sign Up
-          </a>
-        </div>
+    <div className="text-center">
+      {/* Logo */}
+      <div className="flex justify-center">
+        <img
+          className="w-auto h-10"
+          src="https://merakiui.com/images/logo.svg"
+          alt="Logo"
+        />
       </div>
+
+      <h2 className="mt-4 text-xl font-bold text-gray-900 dark:text-gray-200">
+        Login
+      </h2>
+
+      {/* Error message */}
+      {error && (
+        <p className="text-red-500 text-sm text-center mt-2">
+          {error.response?.data?.message || "Login failed!"}
+        </p>
+      )}
+
+      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        {/* Email Input */}
+        <div className="relative">
+          <Mail
+            className="absolute left-3 top-3 text-gray-500 dark:text-gray-400"
+            size={18}
+          />
+          <input
+            className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-green-500 dark:bg-gray-900 dark:text-gray-300"
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Password Input */}
+        <div className="relative">
+          <Lock
+            className="absolute left-3 top-3 text-gray-500 dark:text-gray-400"
+            size={18}
+          />
+          <input
+            className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-green-500 dark:bg-gray-900 dark:text-gray-300"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Login Button */}
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full py-3 rounded-lg bg-green-700 text-white hover:bg-green-800 transition"
+        >
+          {isLoading ? (
+            <Loader2 className="animate-spin mx-auto" size={20} />
+          ) : (
+            "Sign In"
+          )}
+        </button>
+      </form>
+
+      <p className="mt-4 text-sm text-gray-700 dark:text-gray-300">
+        Don’t have an account?{" "}
+        <a
+          href="/signup"
+          className="text-green-700 dark:text-green-400 font-bold hover:underline"
+        >
+          Sign Up
+        </a>
+      </p>
     </div>
   );
 };
