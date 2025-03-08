@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Mail, Lock, Loader2 } from "lucide-react";
 import { useLogin } from "../../hooks/authService";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const { mutate: login, isLoading, error } = useLogin(); // Login mutation hook
@@ -68,6 +69,16 @@ const Login = () => {
           />
         </div>
 
+        {/* Forgot Password Link */}
+        <div className="text-right">
+          <Link
+            to="/email"
+            className="text-sm text-green-700 dark:text-green-400 hover:underline"
+          >
+            Forgot Password?
+          </Link>
+        </div>
+
         {/* Login Button */}
         <button
           type="submit"
@@ -84,12 +95,12 @@ const Login = () => {
 
       <p className="mt-4 text-sm text-gray-700 dark:text-gray-300">
         Don’t have an account?{" "}
-        <a
-          href="/signup"
+        <Link
+          to="/signup"
           className="text-green-700 dark:text-green-400 font-bold hover:underline"
         >
           Sign Up
-        </a>
+        </Link>
       </p>
     </div>
   );

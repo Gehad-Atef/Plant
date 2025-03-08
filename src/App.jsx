@@ -32,8 +32,10 @@ function App() {
       </Route>
 
       {/* ✅ Always Public Pages */}
-      <Route path="/email" element={<VerifyEmail />} />
-      <Route path="/changePass" element={<ChangePassword />} />
+      <Route element={<AuthLayout />}>
+        <Route path="/email" element={<VerifyEmail />} />
+        <Route path="/changePass" element={<ChangePassword />} />
+      </Route>
 
       {/* 🔐 Protected Routes - Require Authentication */}
       <Route element={<AuthGuard />}>

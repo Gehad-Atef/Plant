@@ -1,7 +1,13 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ShoppingCart, Search, Sun, Moon } from "lucide-react";
+// Enhanced Navbar.tsx
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useMotionValueEvent,
+} from "framer-motion";
+import { Menu, X, ShoppingCart, User, Search, Sun, Moon } from "lucide-react";
 import { useTheme } from "../context/ThemeProvider";
 import { useUserContext } from "../context/UserProvider";
 
@@ -9,152 +15,201 @@ const Navbar = () => {
   const { darkMode, toggleDarkMode } = useTheme();
   const { user, logout } = useUserContext();
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setIsScrolled(latest > 50);
+  });
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
+
+  const menuVariants = {
+    open: {
+      opacity: 1,
+      y: 0,
+      transition: { staggerChildren: 0.07, delayChildren: 0.2 },
+    },
+    closed: {
+      opacity: 0,
+      y: -20,
+      transition: { staggerChildren: 0.05, staggerDirection: -1 },
+    },
+  };
+
+  const itemVariants = {
+    open: { opacity: 1, y: 0 },
+    closed: { opacity: 0, y: -10 },
+  };
 
   return (
     <motion.nav
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-gradient-to-r from-green-200 to-white dark:bg-gray-900 shadow-md fixed top-0 left-0 w-full z-50"
+      className={`bg-gradient-to-r from-green-200 to-white dark:from-gray-900 dark:to-gray-600 shadow-md fixed top-0 left-0 w-full z-50 transition-all ${
+        isScrolled ? "backdrop-blur-sm bg-opacity-90" : ""
+      }`}
     >
       <div className="container mx-auto flex justify-between items-center px-6 py-4">
-        {/* ✅ Logo */}
-        <Link
-          to="/"
-          className="text-2xl font-bold text-green-600 dark:text-green-400"
-        >
-          Plant Store
-        </Link>
+        {/* Logo with hover effect */}
+        <motion.div whileHover={{ scale: 1.05 }}>
+          <Link
+            to="/"
+            className="text-2xl font-bold text-green-600 dark:text-green-400 flex items-center gap-2"
+          >
+            <motion.span
+              animate={{ rotate: [0, 20, -20, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              🌿
+            </motion.span>
+            Plant Store
+          </Link>
+        </motion.div>
 
-        {/* ✅ Desktop Menu */}
+        {/* Desktop Menu with animated underline */}
         <div className="hidden md:flex space-x-6 text-gray-700 dark:text-gray-300">
-          <Link to="/" className="hover:text-green-500 transition">
-            Home
-          </Link>
-          <Link to="/about" className="hover:text-green-500 transition">
-            About Us
-          </Link>
-          <Link to="/categories" className="hover:text-green-500 transition">
-            Categories
-          </Link>
-          <Link to="/community" className="hover:text-green-500 transition">
-            Community
-          </Link>
-          <Link to="/contact" className="hover:text-green-500 transition">
-            Contact Us
-          </Link>
+          {["/", "/about", "/categories", "/community", "/contact"].map(
+            (path, idx) => (
+              <Link
+                key={idx}
+                to={path}
+                className="relative px-2 py-1 hover:text-green-500 transition-colors"
+              >
+                {path.slice(1) || "Home"}
+                {location.pathname === path && (
+                  <motion.div
+                    className="absolute bottom-0 left-0 w-full h-0.5 bg-green-500"
+                    layoutId="underline"
+                  />
+                )}
+              </Link>
+            )
+          )}
         </div>
 
-        {/* ✅ Right Actions */}
+        {/* Right Actions */}
         <div className="flex items-center space-x-4">
-          {/* Search Button */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="p-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400"
-          >
-            <Search size={20} />
-          </motion.button>
-
-          {/* Shopping Cart */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="p-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400"
-          >
-            <ShoppingCart size={20} />
-          </motion.button>
-
-          {/* User Profile / Login */}
-          {user ? (
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={logout}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-            >
-              Logout
+          {/* Interactive Search with expand animation */}
+          <motion.div whileHover={{ scale: 1.05 }} className="relative">
+            <motion.button className="p-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400">
+              <Search className="w-5 h-5 text-gray-700 dark:text-gray-300" />
             </motion.button>
-          ) : (
-            <Link
-              to="/login"
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-            >
-              Login
-            </Link>
-          )}
+          </motion.div>
 
-          {/* ✅ Dark Mode Toggle */}
+          {/* Cart with counter */}
+          <motion.div whileHover={{ scale: 1.05 }} className="relative">
+            <motion.button className="p-2 relative">
+              <ShoppingCart className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+              <motion.span
+                className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+              >
+                3
+              </motion.span>
+            </motion.button>
+          </motion.div>
+
+          {/* User Section */}
+          <motion.div className="flex items-center gap-2">
+            {user ? (
+              <>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  className="relative group"
+                  onClick={() => navigate("/profile")}
+                >
+                  <User className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                  <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                    Profile
+                  </span>
+                </motion.button>
+                <motion.button
+                  onClick={logout}
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-transform"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  Logout
+                </motion.button>
+              </>
+            ) : (
+              <motion.div whileHover={{ scale: 1.05 }}>
+                <Link
+                  to="/login"
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                >
+                  Login
+                </Link>
+              </motion.div>
+            )}
+          </motion.div>
+
+          {/* Dark Mode Toggle with flip animation */}
           <motion.button
             onClick={toggleDarkMode}
+            className="p-2 rounded-full bg-gray-200 dark:bg-gray-700"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="p-2 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
-            aria-label="Toggle dark mode"
           >
             <motion.div
               animate={{ rotate: darkMode ? 180 : 0 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
               {darkMode ? (
-                <Sun className="w-5 h-5" />
+                <Sun className="w-5 h-5 text-gray-700 dark:text-gray-300" />
               ) : (
-                <Moon className="w-5 h-5" />
+                <Moon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
               )}
             </motion.div>
           </motion.button>
 
-          {/* ✅ Mobile Menu Button */}
+          {/* Mobile Menu Button */}
           <motion.button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 text-gray-700 dark:text-gray-300"
+            className="md:hidden p-2"
             whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
           >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+            {isOpen ? (
+              <X size={24} className="text-red-500" />
+            ) : (
+              <Menu size={24} />
+            )}
           </motion.button>
         </div>
       </div>
 
-      {/* ✅ Mobile Menu (Animated) */}
+      {/* Animated Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -20, opacity: 0 }}
-            className="md:hidden bg-white dark:bg-gray-800 py-4 px-6"
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={menuVariants}
+            className="md:hidden bg-white dark:bg-gray-800 shadow-lg"
           >
-            <Link
-              to="/"
-              className="block py-2 text-gray-700 dark:text-gray-300 hover:text-green-600"
-            >
-              Home
-            </Link>
-            <Link
-              to="/about"
-              className="block py-2 text-gray-700 dark:text-gray-300 hover:text-green-600"
-            >
-              About Us
-            </Link>
-            <Link
-              to="/categories"
-              className="block py-2 text-gray-700 dark:text-gray-300 hover:text-green-600"
-            >
-              Categories
-            </Link>
-            <Link
-              to="/community"
-              className="block py-2 text-gray-700 dark:text-gray-300 hover:text-green-600"
-            >
-              Community
-            </Link>
-            <Link
-              to="/contact"
-              className="block py-2 text-gray-700 dark:text-gray-300 hover:text-green-600"
-            >
-              Contact Us
-            </Link>
+            {["Home", "About", "Categories", "Community", "Contact"].map(
+              (item, index) => (
+                <motion.div
+                  key={index}
+                  variants={itemVariants}
+                  className="border-b border-gray-200 dark:border-gray-700"
+                >
+                  <Link
+                    to={`/${item.toLowerCase()}`}
+                    className="block py-4 px-6 text-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    {item}
+                  </Link>
+                </motion.div>
+              )
+            )}
           </motion.div>
         )}
       </AnimatePresence>
