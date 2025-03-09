@@ -1,17 +1,18 @@
-import AuthService from "../api/authService";
+import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserContext } from "../context/UserProvider";
-import { useNavigate } from "react-router-dom";
+import AuthService from "../api/authService";
+import toast from "react-hot-toast";
 
 export const useLogin = () => {
-  const { setUser } = useUserContext(); // ✅ Now available!
+  const { setUser } = useUserContext(); // ✅ Access global user state
   const navigate = useNavigate();
 
   return useMutation({
     mutationFn: AuthService.login,
     onSuccess: (data) => {
       if (data.isSuccess) {
-        // Store user info
+        // ✅ Store user info in localStorage
         const user = {
           id: data.value.id,
           email: data.value.email,
@@ -19,7 +20,10 @@ export const useLogin = () => {
           lastName: data.value.lastName,
         };
         localStorage.setItem("user", JSON.stringify(user));
-        setUser(user); // ✅ Update global user state
+        setUser(user); // ✅ Update user state globally
+
+        // 🎉 Show Success Toast
+        toast.success(`Welcome back, ${user.firstName}!`);
 
         // ✅ Navigate to home after login
         navigate("/");
@@ -27,25 +31,64 @@ export const useLogin = () => {
     },
     onError: (error) => {
       console.error("Login Error:", error);
-      alert(error.response?.data?.message || "Login failed");
+
+      // ❌ Show Error Toast
+      toast.error("Login failed! Please check your credentials.");
     },
   });
 };
 
-/**
- * Hook for Registration
- */
 export const useRegister = () => {
   return useMutation({
     mutationFn: AuthService.register,
     onSuccess: (data) => {
-      alert("Registration successful! Please login.");
-      console.log("useRegister Success:", data);
-      window.location.href = "/login";
+      console.log("Registration Success:", data);
+
+      // 🎉 Show Success Toast
+      toast.success("Account created successfully! Please log in.");
+
+      // ✅ Redirect to login page
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 1500);
     },
     onError: (error) => {
-      console.log("useRegister Error:", error);
-      alert(error.response?.data?.message || "Registration failed");
+      console.error("Registration Error:", error);
+
+      // ❌ Show Error Toast
+      toast.error(
+        error.response?.data?.message || "Registration failed. Try again!"
+      );
+    },
+  });
+};
+
+export const useLogout = () => {
+  const navigate = useNavigate();
+  const { setUser } = useUserContext(); // ✅ Clear user from global state
+
+  return useMutation({
+    mutationFn: async () => {
+      await AuthService.logout();
+    },
+    onSuccess: () => {
+      // ✅ Remove user from global state
+      setUser(null);
+      localStorage.removeItem("user");
+
+      // ✅ Show Logout Toast
+      toast.success("Logged out successfully!");
+
+      // ✅ Redirect after logout
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+    },
+    onError: (error) => {
+      console.error("Logout Error:", error);
+
+      // ❌ Show Error Toast
+      toast.error("Logout failed. Please try again!");
     },
   });
 };
@@ -114,13 +157,4 @@ export const useResetPassword = () => {
       alert(error.response?.data?.message || "Password reset failed");
     },
   });
-};
-
-/**
- * Hook for Logout
- */
-export const useLogout = () => {
-  return () => {
-    AuthService.logout();
-  };
 };
