@@ -45,7 +45,9 @@ function App() {
 
       {/* 🔐 Protected Routes - Require Authentication */}
       <Route element={<AuthGuard />}>
-        <Route path="/profile" element={<ProfileCard />} />
+        <Route element={<MainLayout />}>
+          <Route path="/profile" element={<ProfileCard />} />
+        </Route>
       </Route>
 
       {/* 🛡️ Admin Only Routes */}

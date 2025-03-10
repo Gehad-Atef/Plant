@@ -1,33 +1,32 @@
 import { useState } from "react";
-import { FaUser, FaEnvelope, FaPhone, FaPlus } from "react-icons/fa";
-import Navbar from "./Navbar";
-import { useTheme } from "../context/ThemeProvider";
-import { useProfile, useUpdateProfile } from "@/hooks/authService";
-import axiosClient from "@/api/client";
+import { FaUser, FaEnvelope, FaPhone, FaCamera } from "react-icons/fa";
+import { motion } from "framer-motion";
 
-function ProfileCard() {
+import { useTheme } from "../context/ThemeProvider";
+import { useProfile } from "@/hooks/authService";
+import { useUserContext } from "@/context/UserProvider";
+
+const ProfileCard = () => {
+  const { darkMode } = useTheme();
+  const { data: user, isLoading } = useProfile();
+  const { logout } = useUserContext();
+
   const [image, setImage] = useState(
-    "https://t3.ftcdn.net/jpg/01/18/59/38/240_F_118593824_CAAfUDVnd5ZwlCLFWkzUQMaSyLX7h33j.jpg"
+    user?.imagePath ||
+      "https://www.transparentpng.com/thumb/user/gray-user-profile-icon-png-fP8Q1P.png"
   );
 
-  axiosClient
-    .get("/me")
-    .then((response) => console.log(response.data))
-    .catch((error) => console.error(error));
-
-  // const { data: user, isLoading } = useProfile();
-  // const { mutate: updateProfile, isLoading: isUpdating } = useUpdateProfile();
-
-  // console.log("ProfileCard", user);
-
-  const { darkMode } = useTheme();
-
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setImage(URL.createObjectURL(file));
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <motion.div
+          className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1 }}
+        ></motion.div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -37,99 +36,99 @@ function ProfileCard() {
           : "bg-gradient-to-r from-green-200 to-white text-gray-900"
       }`}
     >
-      {/* ✅ Navbar added */}
-      <Navbar />
-
-      <div className="flex items-center justify-center flex-grow">
+      {/* ✅ Profile Container */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="flex items-center justify-center flex-grow"
+      >
         <div
-          className={`shadow-lg rounded-xl p-12 w-[550px] h-[550px] mt-20 transition-all ${
+          className={`shadow-lg rounded-xl p-10 w-[500px] text-center transition-all ${
             darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
           }`}
         >
-          {/* Profile Image Section */}
-          <div className="flex justify-center relative">
-            <div className="relative w-32 h-32">
-              <img
-                src={image}
-                alt="Profile"
-                className="w-full h-full rounded-full shadow-md object-cover border-2 transition ${
-                  darkMode ? 'border-gray-600' : 'border-gray-300'
-                }"
-              />
+          {/* ✅ Profile Image Section */}
+          <div className="relative w-32 h-32 mx-auto">
+            <motion.img
+              src={image}
+              alt="Profile"
+              className="w-full h-full rounded-full shadow-md object-cover border-2 transition-all duration-300 hover:scale-105"
+            />
 
-              {/* Upload Button */}
-              <label className="absolute bottom-0 right-0 w-8 h-8 bg-black text-white text-sm flex items-center justify-center rounded-full cursor-pointer hover:scale-110 transition">
-                <FaPlus />
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
-              </label>
-            </div>
+            {/* 🎥 Image Upload Icon */}
+            <motion.label
+              whileHover={{ scale: 1.1 }}
+              className="absolute bottom-0 right-0 w-10 h-10 bg-green-600 text-white flex items-center justify-center rounded-full cursor-pointer hover:bg-green-500 transition-all"
+            >
+              <FaCamera />
+              <input type="file" accept="image/*" className="hidden" />
+            </motion.label>
           </div>
 
-          {/* User Details */}
-          <div className="grid grid-cols-2 gap-6 mt-6">
-            <div>
-              <p className="font-bold flex items-center">
-                <FaUser className="mr-2" /> First Name
+          {/* ✅ User Info */}
+          <div className="mt-6 space-y-4">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center gap-3"
+            >
+              <FaUser className="text-green-500" />
+              <p className="font-medium">{user?.userName || "Username"}</p>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center gap-3"
+            >
+              <FaEnvelope className="text-green-500" />
+              <p className="font-medium">{user?.email || "Email"}</p>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center gap-3"
+            >
+              <FaUser className="text-green-500" />
+              <p className="font-medium">
+                {user?.firstName || "First Name"}{" "}
+                {user?.lastName || "Last Name"}
               </p>
-              <p className={`${darkMode ? "text-gray-300" : "text-gray-600"}`}>
-                Amelia
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center gap-3"
+            >
+              <FaPhone className="text-green-500" />
+              <p className="font-medium">
+                {user?.phoneNumber || "Phone Number"}
               </p>
-            </div>
-            <div>
-              <p className="font-bold flex items-center">
-                <FaUser className="mr-2" /> Last Name
-              </p>
-              <p className={`${darkMode ? "text-gray-300" : "text-gray-600"}`}>
-                Noah
-              </p>
-            </div>
-            <div>
-              <p className="font-bold flex items-center">
-                <FaUser className="mr-2" /> User Name
-              </p>
-              <p className={`${darkMode ? "text-gray-300" : "text-gray-600"}`}>
-                amelia_no89
-              </p>
-            </div>
-            <div>
-              <p className="font-bold flex items-center">
-                <FaPhone className="mr-2" /> Phone no.
-              </p>
-              <p className={`${darkMode ? "text-gray-300" : "text-gray-600"}`}>
-                +98 1245560090
-              </p>
-            </div>
-            <div className="col-span-2">
-              <p className="font-bold flex items-center">
-                <FaEnvelope className="mr-2" /> E-Mail
-              </p>
-              <p className={`${darkMode ? "text-gray-300" : "text-gray-600"}`}>
-                AmeliaNoah@random.com
-              </p>
-            </div>
+            </motion.div>
           </div>
 
-          {/* Edit Profile Button */}
-          <div className="mt-8 flex justify-center">
-            <button
-              className={`px-8 py-3 rounded-lg shadow-md transition text-lg font-semibold ${
-                darkMode
-                  ? "bg-green-500 hover:bg-green-400 text-white"
-                  : "bg-green-600 hover:bg-green-500 text-white"
-              }`}
+          {/* ✅ Buttons Section */}
+          <div className="mt-8 flex justify-center gap-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-500 transition"
             >
               Edit Profile
-            </button>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={logout}
+              className="px-6 py-2 rounded-lg bg-red-600 text-white hover:bg-red-500 transition"
+            >
+              Logout
+            </motion.button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
-}
+};
 
 export default ProfileCard;
