@@ -1,17 +1,20 @@
 import { Routes, Route } from "react-router-dom";
 
-import HomePage from "./components/HomePage";
+import { AuthGuard, PublicGuard, RoleGuard } from "./routes/ProtectedRoute";
+
+import AuthLayout from "./layouts/AuthLayout";
 import Login from "./components/Authentication/Login";
 import SignUp from "./components/Authentication/SignUp";
-import AboutUs from "./components/AboutUs";
-import ContactUs from "./components/ContactUs";
-import ProfileCard from "./components/Profile";
 import VerifyEmail from "./components/Authentication/VerifyEmail";
 import ChangePassword from "./components/Authentication/ChangePassword";
 
-import { AuthGuard, PublicGuard, RoleGuard } from "./routes/ProtectedRoute";
 import MainLayout from "./layouts/MainLayout";
-import AuthLayout from "./layouts/AuthLayout";
+import HomePage from "./components/HomePage";
+import AboutUs from "./components/AboutUs";
+import ContactUs from "./components/ContactUs";
+import ProfileCard from "./components/Profile";
+
+import Cart from "./components/Cart";
 
 function App() {
   return (
@@ -29,6 +32,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactUs />} />
+        <Route path="/cart" element={<Cart />} />
       </Route>
 
       {/* ✅ Always Public Pages */}

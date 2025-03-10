@@ -74,7 +74,7 @@ const Navbar = () => {
 
         {/* Desktop Menu with animated underline */}
         <div className="hidden md:flex space-x-6 text-gray-700 dark:text-gray-300">
-          {["/", "/about", "/categories", "/community", "/contact"].map(
+          {["/", "/About", "/Categories", "/Community", "/Contact"].map(
             (path, idx) => (
               <Link
                 key={idx}
@@ -104,7 +104,10 @@ const Navbar = () => {
 
           {/* Cart with counter */}
           <motion.div whileHover={{ scale: 1.05 }} className="relative">
-            <motion.button className="p-2 relative">
+            <motion.button
+              className="p-2 relative"
+              onClick={() => navigate("/cart")}
+            >
               <ShoppingCart className="w-5 h-5 text-gray-700 dark:text-gray-300" />
               <motion.span
                 className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"

@@ -23,7 +23,9 @@ const PlantShop = () => {
   return (
     <div
       className={`min-h-screen font-sans transition-colors duration-300 ${
-        darkMode ? "bg-gray-900 text-white" : "bg-green-100 text-gray-900"
+        darkMode
+          ? "bg-gray-900 text-white"
+          : "bg-gradient-to-r from-green-200 to-white text-gray-900"
       }`}
     >
       {/* 🌿 Hero Section */}
