@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { User, Mail, Phone, Loader2, Edit, LogOut } from "lucide-react";
+import { User, Mail, Phone, Loader2, Edit, Lock } from "lucide-react";
+
 import { useTheme } from "../context/ThemeProvider";
-import { useProfile } from "@/hooks/authService";
-import { useUserContext } from "@/context/UserProvider";
-import UpdateProfileDialog from "./UpdateProfileDialog";
+
 import { Dialog } from "./ui/dialog";
+import { useProfile } from "@/hooks/authService";
+
+import UpdateProfileDialog from "./UpdateProfileDialog";
+import ChangePasswordDialog from "./ChangePasswordDialog";
 
 const ProfileCard = () => {
   const { darkMode } = useTheme();
   const { data: user, isLoading } = useProfile();
-  const { logout } = useUserContext();
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [showChangePasswordDialog, setShowChangePasswordDialog] =
+    useState(false);
 
   const defaultImage =
     "https://www.transparentpng.com/thumb/user/gray-user-profile-icon-png-fP8Q1P.png";
@@ -130,11 +134,11 @@ const ProfileCard = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={logout}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl shadow-lg hover:shadow-red-500/20 transition-all"
+              onClick={() => setShowChangePasswordDialog(true)} // Open change password dialog
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl shadow-lg hover:shadow-blue-500/20 transition-all"
             >
-              <LogOut className="w-5 h-5" />
-              <span className="font-semibold">Logout</span>
+              <Lock className="w-5 h-5" />
+              <span className="font-semibold">Change Password</span>
             </motion.button>
           </div>
         </div>
@@ -148,6 +152,16 @@ const ProfileCard = () => {
             open={showUpdateDialog}
             setOpen={setShowUpdateDialog}
           />
+        )}
+      </Dialog>
+
+      {/* Change Password Dialog */}
+      <Dialog
+        open={showChangePasswordDialog}
+        onOpenChange={setShowChangePasswordDialog}
+      >
+        {showChangePasswordDialog && (
+          <ChangePasswordDialog setOpen={setShowChangePasswordDialog} />
         )}
       </Dialog>
     </div>

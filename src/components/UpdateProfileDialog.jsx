@@ -5,7 +5,6 @@ import {
   DialogContent,
   DialogTitle,
   DialogDescription,
-  DialogClose,
 } from "@/components/ui/Dialog";
 import { useUpdateProfile } from "@/hooks/authService";
 
@@ -112,7 +111,7 @@ const UpdateProfileDialog = ({ user, open, setOpen }) => {
                 value={formData.firstName}
                 onChange={handleChange}
                 placeholder="First Name"
-                className="w-full pl-12 pr-4 py-3 bg-gray-100/50 dark:bg-gray-800/50 rounded-xl border border-gray-200/50 dark:border-gray-700 focus:ring-2 focus:ring-green-500 focus:border-transparent dark:text-gray-300"
+                className="w-full pl-12 pr-4 py-3 bg-gray-100/50 dark:bg-gray-800/50 rounded-xl border border-gray-500/50 dark:border-gray-700 focus:ring-2 focus:ring-green-500 focus:border-transparent dark:text-gray-300"
               />
             </motion.div>
 
@@ -129,7 +128,7 @@ const UpdateProfileDialog = ({ user, open, setOpen }) => {
                 value={formData.lastName}
                 onChange={handleChange}
                 placeholder="Last Name"
-                className="w-full pl-12 pr-4 py-3 bg-gray-100/50 dark:bg-gray-800/50 rounded-xl border border-gray-200/50 dark:border-gray-700 focus:ring-2 focus:ring-green-500 focus:border-transparent dark:text-gray-300"
+                className="w-full pl-12 pr-4 py-3 bg-gray-100/50 dark:bg-gray-800/50 rounded-xl border border-gray-500/50 dark:border-gray-700 focus:ring-2 focus:ring-green-500 focus:border-transparent dark:text-gray-300"
               />
             </motion.div>
 
@@ -146,22 +145,13 @@ const UpdateProfileDialog = ({ user, open, setOpen }) => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 placeholder="Phone Number"
-                className="w-full pl-12 pr-4 py-3 bg-gray-100/50 dark:bg-gray-800/50 rounded-xl border border-gray-200/50 dark:border-gray-700 focus:ring-2 focus:ring-green-500 focus:border-transparent dark:text-gray-300"
+                className="w-full pl-12 pr-4 py-3 bg-gray-100/50 dark:bg-gray-800/50 rounded-xl border border-gray-500/50 dark:border-gray-700 focus:ring-2 focus:ring-green-500 focus:border-transparent dark:text-gray-300"
               />
             </motion.div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-4">
-            <DialogClose asChild>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-6 py-2.5 bg-gray-500/20 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-600/20 transition-all"
-              >
-                Cancel
-              </motion.button>
-            </DialogClose>
             <motion.button
               type="submit"
               disabled={isLoading}
