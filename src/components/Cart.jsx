@@ -1,31 +1,94 @@
 import { useState } from "react";
-import {
-  FaCcVisa,
-  FaCcMastercard,
-  FaPaypal,
-  FaGift,
-  FaMoneyBillAlt,
-  FaPlus,
-} from "react-icons/fa";
-import { FiTrash, FiEdit3 } from "react-icons/fi";
+
+import { FiTrash } from "react-icons/fi";
 import { useTheme } from "../context/ThemeProvider";
+import { Gift, Minus, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
+  const navigate = useNavigate();
   const { darkMode } = useTheme();
 
   const [cartItems, setCartItems] = useState([
-    { id: 1, name: "Lavender", price: 45, image: "lavender.png", quantity: 1 },
-    { id: 2, name: "Lewisia", price: 60, image: "lewisia.png", quantity: 1 },
+    {
+      id: 1,
+      name: "Lavender",
+      price: 45,
+      quantity: 1,
+      img: "src/assets/Images/Lavende.png",
+    },
+    {
+      id: 2,
+      name: "Lewisia",
+      price: 60,
+      quantity: 1,
+      img: "src/assets/Images/Lewisia.png",
+    },
+    {
+      id: 3,
+      name: "Lily",
+      price: 30,
+      quantity: 1,
+      img: "src/assets/Images/Indoor.png",
+    },
   ]);
-  const [selectedPayment, setSelectedPayment] = useState("visa");
   const [promoCode, setPromoCode] = useState("");
+  const [isPromoApplied, setIsPromoApplied] = useState(false);
+  const [discount, setDiscount] = useState(0);
 
-  const total = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
+  const handlePayClick = () => {
+    navigate("/payment");
+  };
+
+  // Function to delete an item from the cart
+  const handleDeleteItem = (id) => {
+    setCartItems(cartItems.filter((item) => item.id !== id));
+  };
+
+  // Function to increase the quantity of an item
+  const handleIncreaseQuantity = (id) => {
+    setCartItems(
+      cartItems.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
+  };
+  // Function to decrease the quantity of an item
+  const handleDecreaseQuantity = (id) => {
+    setCartItems(
+      cartItems.map((item) =>
+        item.id === id && item.quantity > 1
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
+      )
+    );
+  };
+  // Function to apply promo code
+  const applyPromoCode = () => {
+    const validPromoCodes = {
+      SAVE10: 10, // 10% discount
+      SAVE20: 20, // 20% discount
+    };
+
+    if (validPromoCodes[promoCode]) {
+      setIsPromoApplied(true);
+      setDiscount(validPromoCodes[promoCode]);
+      alert("Promo code applied successfully!");
+    } else {
+      setIsPromoApplied(false);
+      setDiscount(0);
+      alert("Invalid promo code.");
+    }
+  };
+  const totalCost = cartItems.reduce(
+    (total, item) => total + item.price * item.quantity,
     0
   );
-  const shipping = total >= 200 ? 0 : 15;
-  const totalCost = total + shipping;
+  const shippingCost = 15; // Fixed shipping cost
+  const totalAmount = totalCost + shippingCost;
+
+  // Calculate discounted total
+  const discountedTotal = totalAmount * (1 - discount / 100);
 
   return (
     <div
@@ -55,7 +118,7 @@ const Cart = () => {
                   } mb-3`}
                 >
                   <img
-                    src={item.image}
+                    src={item.img}
                     alt={item.name}
                     className="w-14 h-14 object-cover rounded-md"
                   />
@@ -66,121 +129,89 @@ const Cart = () => {
                         darkMode ? "text-gray-300" : "text-gray-600"
                       }`}
                     >
-                      {item.price} L.E
+                      {item.price * item.quantity} L.E
                     </p>
-                    <button className="text-green-600 flex items-center gap-1 mt-1">
-                      <FiEdit3 />
-                      Edit Order
-                    </button>
+                    {/* <button
+                      onClick={() => handleDeleteItem(item.id)}
+                      className="text-sm text-green-500 flex items-center gap-1"
+                    >
+                      <Trash2 className="w-4 h-4" /> Delete
+                    </button> */}
                   </div>
                   <div className="flex items-center space-x-2">
-                    <button className="px-2 text-lg font-bold bg-gray-300 dark:bg-gray-600 rounded-md">
-                      -
+                    <button
+                      onClick={() => handleDecreaseQuantity(item.id)}
+                      className="p-2 bg-gray-200 dark:bg-gray-700 rounded"
+                    >
+                      <Minus className="w-4 h-4" />
                     </button>
                     <span className="px-3">{item.quantity}</span>
-                    <button className="px-2 text-lg font-bold bg-gray-300 dark:bg-gray-600 rounded-md">
-                      +
+                    <button
+                      onClick={() => handleIncreaseQuantity(item.id)}
+                      className="p-2 bg-gray-200 dark:bg-gray-700 rounded"
+                    >
+                      <Plus className="w-4 h-4" />
                     </button>
                   </div>
-                  <FiTrash className="text-red-500 cursor-pointer text-lg" />
+                  <FiTrash
+                    className="text-red-500 cursor-pointer text-lg"
+                    onClick={() => handleDeleteItem(item.id)}
+                  />
                 </div>
               ))}
             </div>
 
             {/* ✅ Summary Orders - Right */}
-            <div
-              className={`border p-6 rounded-lg transition-all ${
-                darkMode ? "border-gray-700 bg-gray-700" : "border-gray-200"
-              }`}
-            >
-              <h2 className="text-xl font-semibold mb-4">Summary Orders</h2>
-              <div className="mb-4">
-                <div className="flex justify-between mb-2">
-                  <p>Total</p>
-                  <p>{total} L.E</p>
-                </div>
-                <div className="flex justify-between mb-2">
-                  <p>Shipping</p>
-                  <p>{shipping} L.E</p>
-                </div>
-                <hr className="my-2" />
-                <div className="flex justify-between font-bold">
-                  <p>Total Cost</p>
-                  <p>{totalCost} L.E</p>
-                </div>
-              </div>
-              <div className="flex">
+            <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+              <h3 className="text-2xl font-bold">Summary Orders</h3>
+              <div className="mt-4">
                 <input
                   type="text"
-                  placeholder="Promo code"
-                  className={`w-full p-2 border rounded-l-md ${
-                    darkMode
-                      ? "bg-gray-600 border-gray-500 text-white placeholder-gray-300"
-                      : "border-gray-300"
-                  }`}
+                  placeholder="Promocode"
                   value={promoCode}
-                  onChange={(e) => setPromoCode(e.target.value)}
+                  onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                  className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
                 />
-                <button className="bg-green-500 text-white px-4 rounded-r-md hover:bg-green-400 transition flex items-center">
-                  APPLY <FaPlus className="ml-1 text-sm" />
+                <button
+                  onClick={applyPromoCode}
+                  className="mt-2 bg-[#5AAC38] text-white p-2 rounded w-full flex justify-center items-center"
+                >
+                  APPLY <Plus className="w-4 h-4 ml-2" />
                 </button>
               </div>
-              <button className="w-full bg-green-600 text-white py-3 mt-4 rounded-md hover:bg-green-500 transition">
-                Pay Now
+              <div className="mt-4">
+                <p>
+                  Total: <span className="float-right">{totalCost} L.E</span>
+                </p>
+                <p>
+                  Shipping:{" "}
+                  <span className="float-right">{shippingCost} L.E</span>
+                </p>
+                {isPromoApplied && (
+                  <p>
+                    Discount ({discount}%):{" "}
+                    <span className="float-right">
+                      -{totalAmount * (discount / 100)} L.E
+                    </span>
+                  </p>
+                )}
+                <p className="font-bold">
+                  Total Cost:{" "}
+                  <span className="float-right">
+                    {isPromoApplied ? discountedTotal.toFixed(2) : totalAmount}{" "}
+                    L.E
+                  </span>
+                </p>
+              </div>
+              <button
+                className="mt-4 bg-[#5AAC38] text-white p-2 rounded w-full"
+                onClick={handlePayClick}
+              >
+                Pay
               </button>
-            </div>
-          </div>
-
-          {/* ✅ Payment Methods */}
-          <div className="mt-6">
-            <h2 className="text-xl font-semibold mb-4">Payment</h2>
-            <button className="flex items-center gap-2 text-green-600 font-medium mb-2">
-              <FaPlus /> Add Payment Card
-            </button>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                {
-                  method: "visa",
-                  label: "Visa Debit Card",
-                  icon: <FaCcVisa className="text-blue-800 text-2xl" />,
-                  last4: "5212",
-                },
-                {
-                  method: "mastercard",
-                  label: "MasterCard",
-                  icon: <FaCcMastercard className="text-red-500 text-2xl" />,
-                  last4: "8423",
-                },
-                {
-                  method: "paypal",
-                  label: "PayPal",
-                  icon: <FaPaypal className="text-blue-500 text-2xl" />,
-                  last4: "4895",
-                },
-                {
-                  method: "cash",
-                  label: "Cash on Delivery",
-                  icon: <FaMoneyBillAlt className="text-green-600 text-2xl" />,
-                  last4: "",
-                },
-              ].map(({ method, label, icon, last4 }) => (
-                <div
-                  key={method}
-                  className={`flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                    selectedPayment === method
-                      ? "border-green-500 bg-green-50"
-                      : "border-gray-200 hover:border-green-300 hover:bg-gray-50"
-                  }`}
-                  onClick={() => setSelectedPayment(method)}
-                >
-                  <div className="flex items-center gap-4">
-                    <span>{icon}</span>
-                    <p className="font-medium">
-                      {label} {last4 && `•••• ${last4}`}
-                    </p>
-                  </div>
-                </div>
-              ))}
+              <button className="mt-2 bg-gray-200 dark:bg-gray-700 text-[#5AAC38] flex justify-center items-center p-2 rounded w-full">
+                <Gift className="w-5 h-5 mr-2" /> Pay with Gift Card
+              </button>
             </div>
           </div>
         </div>

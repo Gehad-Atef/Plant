@@ -15,6 +15,7 @@ import ContactUs from "./components/ContactUs";
 import ProfileCard from "./components/Profile";
 
 import Cart from "./components/Cart";
+import Checkout from "./components/Checkout";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/payment" element={<Checkout />} />
       </Route>
 
       {/* ✅ Always Public Pages */}
