@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import AuthService from "../api/authService";
 import { useUserContext } from "../context/UserProvider";
@@ -8,23 +8,20 @@ import { useUserContext } from "../context/UserProvider";
 export const useLogin = () => {
   const { setUser } = useUserContext(); // ✅ Access global user state
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: AuthService.login,
     onSuccess: (data) => {
       if (data.isSuccess) {
-        // ✅ Store user info in localStorage
-        const user = {
-          id: data.value.id,
-          email: data.value.email,
-          firstName: data.value.fristName,
-          lastName: data.value.lastName,
-        };
-        localStorage.setItem("user", JSON.stringify(user));
-        setUser(user); // ✅ Update user state globally
+        // ✅ Fetch fresh user data instead of relying on localStorage
+        queryClient.invalidateQueries(["userProfile"]);
+
+        // ✅ Update user state globally
+        setUser(data.value);
 
         // 🎉 Show Success Toast
-        toast.success(`Welcome back, ${user.firstName}!`);
+        toast.success(`Welcome back, ${data.value.firstName}!`);
 
         // ✅ Navigate to home after login
         navigate("/");
@@ -40,18 +37,16 @@ export const useLogin = () => {
 };
 
 export const useRegister = () => {
+  const navigate = useNavigate();
+
   return useMutation({
     mutationFn: AuthService.register,
-    onSuccess: (data) => {
-      console.log("Registration Success:", data);
-
+    onSuccess: () => {
       // 🎉 Show Success Toast
       toast.success("Account created successfully! Please log in.");
 
       // ✅ Redirect to login page
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 1500);
+      navigate("/login");
     },
     onError: (error) => {
       console.error("Registration Error:", error);
@@ -66,7 +61,8 @@ export const useRegister = () => {
 
 export const useLogout = () => {
   const navigate = useNavigate();
-  const { setUser } = useUserContext(); // ✅ Clear user from global state
+  const { setUser } = useUserContext();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async () => {
@@ -75,15 +71,15 @@ export const useLogout = () => {
     onSuccess: () => {
       // ✅ Remove user from global state
       setUser(null);
-      localStorage.removeItem("user");
+
+      // ✅ Invalidate user profile query
+      queryClient.invalidateQueries(["userProfile"]);
 
       // ✅ Show Logout Toast
       toast.success("Logged out successfully!");
 
       // ✅ Redirect after logout
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
+      navigate("/login");
     },
     onError: (error) => {
       console.error("Logout Error:", error);
@@ -98,18 +94,23 @@ export const useProfile = () => {
   return useQuery({
     queryKey: ["userProfile"],
     queryFn: AuthService.getProfile,
+    // staleTime: 0, // Always refetch on each request
+    // cacheTime: 0, // Prevent caching old user data
+    // refetchOnMount: true, // Refetch when the component mounts
+    // refetchOnWindowFocus: true, // Refetch when user focuses on the window
   });
 };
 
 // Hook to update profile
 export const useUpdateProfile = () => {
-  const { setUser } = useUserContext();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: AuthService.updateProfile,
-    onSuccess: (data) => {
+    onSuccess: () => {
+      // ✅ Invalidate user data after updating profile
+      queryClient.invalidateQueries(["userProfile"]);
       toast.success("Profile updated successfully!");
-      setUser(data); // Update global state
     },
     onError: () => {
       toast.error("Failed to update profile.");

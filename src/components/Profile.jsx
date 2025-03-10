@@ -1,132 +1,155 @@
 import { useState } from "react";
-import { FaUser, FaEnvelope, FaPhone, FaCamera } from "react-icons/fa";
 import { motion } from "framer-motion";
-
+import { User, Mail, Phone, Loader2, Edit, LogOut } from "lucide-react";
 import { useTheme } from "../context/ThemeProvider";
 import { useProfile } from "@/hooks/authService";
 import { useUserContext } from "@/context/UserProvider";
+import UpdateProfileDialog from "./UpdateProfileDialog";
+import { Dialog } from "./ui/dialog";
 
 const ProfileCard = () => {
   const { darkMode } = useTheme();
   const { data: user, isLoading } = useProfile();
   const { logout } = useUserContext();
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
 
-  const [image, setImage] = useState(
-    user?.imagePath ||
-      "https://www.transparentpng.com/thumb/user/gray-user-profile-icon-png-fP8Q1P.png"
-  );
+  const defaultImage =
+    "https://www.transparentpng.com/thumb/user/gray-user-profile-icon-png-fP8Q1P.png";
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <motion.div
-          className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1 }}
-        ></motion.div>
+      <div className="flex items-center justify-center h-screen pt-24">
+        <Loader2 className="w-12 h-12 text-green-500 animate-spin" />
       </div>
     );
   }
 
   return (
     <div
-      className={`min-h-screen flex flex-col transition-colors duration-300 ${
+      className={`min-h-screen flex items-center justify-center p-4 pt-24 transition-colors duration-300 ${
         darkMode
-          ? "bg-gray-900 text-white"
+          ? "bg-gradient-to-br from-gray-800 via-gray-900 to-gray-950"
           : "bg-gradient-to-r from-green-200 to-white text-gray-900"
       }`}
     >
-      {/* ✅ Profile Container */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="flex items-center justify-center flex-grow"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative group w-full max-w-md"
       >
-        <div
-          className={`shadow-lg rounded-xl p-10 w-[500px] text-center transition-all ${
-            darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
-          }`}
-        >
-          {/* ✅ Profile Image Section */}
+        {/* Glow effect */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-600 rounded-2xl opacity-20 group-hover:opacity-30 blur transition duration-1000" />
+
+        <div className="relative space-y-6 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20 dark:border-gray-700">
+          {/* Profile Image Section */}
           <div className="relative w-32 h-32 mx-auto">
             <motion.img
-              src={image}
+              src={user?.imagePath || defaultImage}
               alt="Profile"
-              className="w-full h-full rounded-full shadow-md object-cover border-2 transition-all duration-300 hover:scale-105"
+              className="w-full h-full rounded-full object-cover border-4 border-white/50 dark:border-gray-800 shadow-xl hover:border-green-300 dark:hover:border-green-500 transition-all duration-300"
+              whileHover={{ scale: 1.05 }}
             />
-
-            {/* 🎥 Image Upload Icon */}
-            <motion.label
-              whileHover={{ scale: 1.1 }}
-              className="absolute bottom-0 right-0 w-10 h-10 bg-green-600 text-white flex items-center justify-center rounded-full cursor-pointer hover:bg-green-500 transition-all"
-            >
-              <FaCamera />
-              <input type="file" accept="image/*" className="hidden" />
-            </motion.label>
           </div>
 
-          {/* ✅ User Info */}
-          <div className="mt-6 space-y-4">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center gap-3"
-            >
-              <FaUser className="text-green-500" />
-              <p className="font-medium">{user?.userName || "Username"}</p>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center gap-3"
-            >
-              <FaEnvelope className="text-green-500" />
-              <p className="font-medium">{user?.email || "Email"}</p>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center gap-3"
-            >
-              <FaUser className="text-green-500" />
-              <p className="font-medium">
-                {user?.firstName || "First Name"}{" "}
-                {user?.lastName || "Last Name"}
+          {/* Username & Name Section */}
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="text-center space-y-2"
+          >
+            <div className="inline-flex items-center gap-2 bg-green-100 dark:bg-gray-800 px-4 py-2 rounded-full">
+              <User className="w-5 h-5 text-green-600 dark:text-green-400" />
+              <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+                @{user?.userName}
+              </h2>
+            </div>
+            {(user?.firstName || user?.lastName) && (
+              <p className="text-lg text-gray-600 dark:text-gray-400">
+                {user?.firstName} {user?.lastName}
               </p>
+            )}
+          </motion.div>
+
+          {/* User Info Sections */}
+          <div className="space-y-4">
+            {/* Email Section */}
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              className="py-2 px-4 bg-gradient-to-r from-green-50/50 to-transparent dark:from-gray-800 rounded-xl flex items-center gap-4 border border-green-100/50 dark:border-gray-700"
+            >
+              <div className="p-3 bg-green-100 dark:bg-gray-800 rounded-lg">
+                <Mail className="w-6 h-6 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Email
+                </p>
+                <p className="font-semibold text-gray-800 dark:text-gray-200">
+                  {user?.email || "Not provided"}
+                </p>
+              </div>
             </motion.div>
 
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center gap-3"
-            >
-              <FaPhone className="text-green-500" />
-              <p className="font-medium">
-                {user?.phoneNumber || "Phone Number"}
-              </p>
-            </motion.div>
+            {/* Phone Section */}
+            {user?.phoneNumber && (
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="py-2 px-4 bg-gradient-to-r from-green-50/50 to-transparent dark:from-gray-800 rounded-xl flex items-center gap-4 border border-green-100/50 dark:border-gray-700"
+              >
+                <div className="p-3 bg-green-100 dark:bg-gray-800 rounded-lg">
+                  <Phone className="w-6 h-6 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Phone
+                  </p>
+                  <p className="font-semibold text-gray-800 dark:text-gray-200">
+                    {user.phoneNumber}
+                  </p>
+                </div>
+              </motion.div>
+            )}
           </div>
 
-          {/* ✅ Buttons Section */}
-          <div className="mt-8 flex justify-center gap-4">
+          {/* Action Buttons */}
+          <div className="flex flex-col gap-3 mt-8">
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-500 transition"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setShowUpdateDialog(true)}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl shadow-lg hover:shadow-green-500/20 transition-all"
             >
-              Edit Profile
+              <Edit className="w-5 h-5" />
+              <span className="font-semibold">Edit Profile</span>
             </motion.button>
 
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={logout}
-              className="px-6 py-2 rounded-lg bg-red-600 text-white hover:bg-red-500 transition"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl shadow-lg hover:shadow-red-500/20 transition-all"
             >
-              Logout
+              <LogOut className="w-5 h-5" />
+              <span className="font-semibold">Logout</span>
             </motion.button>
           </div>
         </div>
       </motion.div>
+
+      {/* Update Profile Dialog */}
+      <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
+        {showUpdateDialog && (
+          <UpdateProfileDialog
+            user={user}
+            open={showUpdateDialog}
+            setOpen={setShowUpdateDialog}
+          />
+        )}
+      </Dialog>
     </div>
   );
 };

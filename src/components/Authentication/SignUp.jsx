@@ -18,10 +18,13 @@ const SignUp = () => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword)
       return alert("Passwords do not match!");
+
+    console.log("handleSubmit", formData);
     register({
       UserName: formData.username,
       Email: formData.email,
       Password: formData.password,
+      ComfirmPassword: formData.confirmPassword,
     });
   };
 

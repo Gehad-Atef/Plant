@@ -42,7 +42,6 @@ const AuthService = {
   getProfile: async () => {
     try {
       const response = await axiosClient.get("me");
-      console.log("getProfile response", response);
       return response.data;
     } catch (error) {
       console.error("Get Profile Error:", error);
