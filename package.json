@@ -10,12 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.1.2",
     "@reduxjs/toolkit": "^2.5.1",
     "@tanstack/query-sync-storage-persister": "^5.67.2",
     "@tanstack/react-query": "^5.67.2",
     "@tanstack/react-query-devtools": "^5.67.2",
     "@tanstack/react-query-persist-client": "^5.67.2",
     "axios": "^1.8.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.4.10",
     "lucide-react": "^0.474.0",
     "prop-types": "^15.8.1",
@@ -25,10 +28,13 @@
     "react-icons": "^5.4.0",
     "react-redux": "^9.2.0",
     "react-router": "^6.30.0",
-    "react-router-dom": "^6.28.2"
+    "react-router-dom": "^6.28.2",
+    "tailwind-merge": "^3.0.2",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@types/node": "^22.13.10",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",

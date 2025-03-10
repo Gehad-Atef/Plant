@@ -1,13 +1,14 @@
 import { motion } from "framer-motion";
-import plantImage from "../assets/Images/image.png";
+import { Quote } from "lucide-react";
+
+import { useTheme } from "../context/ThemeProvider";
 
 // Category Images
 import indoorPlantImage from "../assets/Images/Indoor.png";
 import outdoorPlantImage from "../assets/Images/Outdoor.png";
 import cactusImage from "../assets/Images/Cactus.png";
 import bonsaiImage from "../assets/Images/Bonsai.png";
-import { useTheme } from "../context/ThemeProvider";
-import { Quote } from "lucide-react";
+import plantImage from "../assets/Images/image.png";
 
 // Plant categories as an array
 const plantCategories = [
