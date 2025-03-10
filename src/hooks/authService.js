@@ -1,8 +1,9 @@
-import { useNavigate } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useUserContext } from "../context/UserProvider";
-import AuthService from "../api/authService";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { useMutation, useQuery } from "@tanstack/react-query";
+
+import AuthService from "../api/authService";
+import { useUserContext } from "../context/UserProvider";
 
 export const useLogin = () => {
   const { setUser } = useUserContext(); // ✅ Access global user state
@@ -93,68 +94,38 @@ export const useLogout = () => {
   });
 };
 
-// data:
-//   error: {code: '', discription: ''}
-//   isFailure: false
-//   isSuccess: true
-//   value:
-//     email: "aya.123@gmail.com"
-//     expirestIn: 1800
-//     fristName: "aya"
-//     id: "cd64c48f-7460-43fd-b5a7-8e421fb2ea7e"
-//     lastName: ""
-//     refreshToken : "H4mCBzFMyp/N2H75JKpj/fAzWu5ogQE9whDZMqs9+TyyhY1p+PCM6Dq8lbYR2kCyESKKQ7Pj/UjsOZa0xvwxvg=="
-//     refreshTokenExpiration :  "2025-03-21T22:18:49.7423289Z"
-//     token : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjZDY0YzQ4Zi03NDYwLTQzZmQtYjVhNy04ZTQyMWZiMmVhN2UiLCJlbWFpbCI6Im
+export const useProfile = () => {
+  return useQuery({
+    queryKey: ["userProfile"],
+    queryFn: AuthService.getProfile,
+  });
+};
 
-/**
- * Hook for Refreshing Token
- */
-export const useRefreshToken = () => {
-  const queryClient = useQueryClient();
+// Hook to update profile
+export const useUpdateProfile = () => {
+  const { setUser } = useUserContext();
 
   return useMutation({
-    mutationFn: AuthService.refreshToken,
+    mutationFn: AuthService.updateProfile,
     onSuccess: (data) => {
-      console.log("useRefreshToken", data);
-      queryClient.invalidateQueries(["user"]); // Refresh user data if needed
+      toast.success("Profile updated successfully!");
+      setUser(data); // Update global state
     },
-    onError: (error) => {
-      console.error("useRefreshToken Error:", error);
-      AuthService.logout();
-    },
-  });
-};
-
-/**
- * Hook for Forget Password
- */
-export const useForgetPassword = () => {
-  return useMutation({
-    mutationFn: AuthService.forgetPassword,
-    onSuccess: () => {
-      alert("Password reset link sent!");
-    },
-    onError: (error) => {
-      console.error("useForgetPassword Error:", error);
-      alert(error.response?.data?.message || "Failed to send reset link");
+    onError: () => {
+      toast.error("Failed to update profile.");
     },
   });
 };
 
-/**
- * Hook for Reset Password
- */
-export const useResetPassword = () => {
+// Hook to change password
+export const useChangePassword = () => {
   return useMutation({
-    mutationFn: AuthService.resetPassword,
+    mutationFn: AuthService.changePassword,
     onSuccess: () => {
-      alert("Password reset successful! Please login.");
-      window.location.href = "/login";
+      toast.success("Password changed successfully!");
     },
-    onError: (error) => {
-      console.error("useResetPassword Error:", error);
-      alert(error.response?.data?.message || "Password reset failed");
+    onError: () => {
+      toast.error("Failed to change password.");
     },
   });
 };

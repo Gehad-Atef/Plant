@@ -2,10 +2,23 @@ import { useState } from "react";
 import { FaUser, FaEnvelope, FaPhone, FaPlus } from "react-icons/fa";
 import Navbar from "./Navbar";
 import { useTheme } from "../context/ThemeProvider";
+import { useProfile, useUpdateProfile } from "@/hooks/authService";
+import axiosClient from "@/api/client";
+
 function ProfileCard() {
   const [image, setImage] = useState(
-    "https://randomuser.me/api/portraits/women/44.jpg"
+    "https://t3.ftcdn.net/jpg/01/18/59/38/240_F_118593824_CAAfUDVnd5ZwlCLFWkzUQMaSyLX7h33j.jpg"
   );
+
+  axiosClient
+    .get("/me")
+    .then((response) => console.log(response.data))
+    .catch((error) => console.error(error));
+
+  // const { data: user, isLoading } = useProfile();
+  // const { mutate: updateProfile, isLoading: isUpdating } = useUpdateProfile();
+
+  // console.log("ProfileCard", user);
 
   const { darkMode } = useTheme();
 
