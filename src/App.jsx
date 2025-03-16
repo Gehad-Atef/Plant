@@ -22,7 +22,7 @@ function App() {
     <Routes>
       {/* 🏆 Public Routes - Accessible only if NOT logged in */}
       <Route element={<PublicGuard />}>
-        <Route element={<AuthLayout />}>
+        <Route element={<AuthL ayout />}>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
         </Route>
