@@ -130,3 +130,33 @@ export const useChangePassword = () => {
     },
   });
 };
+
+/**
+ * Hook for Forgot Password - Sends an email with a reset link
+ */
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: AuthService.forgotPassword,
+    onSuccess: () => {
+      toast.success("Password reset email sent! Check your inbox.");
+    },
+    onError: () => {
+      toast.error("Failed to send password reset email.");
+    },
+  });
+};
+
+/**
+ * Hook for Reset Password - Completes the password reset process
+ */
+export const useResetPassword = () => {
+  return useMutation({
+    mutationFn: AuthService.resetPassword,
+    onSuccess: () => {
+      toast.success("Password reset successfully! You can now log in.");
+    },
+    onError: () => {
+      toast.error("Failed to reset password.");
+    },
+  });
+};

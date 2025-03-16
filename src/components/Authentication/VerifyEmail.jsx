@@ -1,11 +1,13 @@
+import { useForgotPassword } from "@/hooks/authService";
 import { useState } from "react";
 
 function VerifyEmail() {
   const [email, setEmail] = useState("");
+  const forgotPassword = useForgotPassword(); // Use forgot password mutation
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`Verification email sent to: ${email}`);
+    forgotPassword.mutate(email); // Call the forgot password function
   };
 
   return (
@@ -41,14 +43,15 @@ function VerifyEmail() {
         <button
           type="submit"
           className="w-full bg-green-600 text-white py-3 rounded-lg shadow-md hover:bg-green-700 transition text-lg font-semibold"
+          disabled={forgotPassword.isLoading} // Disable button while loading
         >
-          Verify
+          {forgotPassword.isLoading ? "Sending..." : "Verify"}
         </button>
       </form>
 
       <div className="text-center mt-6">
         <a
-          href="login"
+          href="/login"
           className="text-sm text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-400"
         >
           Back

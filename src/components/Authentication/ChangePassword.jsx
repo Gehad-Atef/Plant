@@ -1,11 +1,18 @@
+import { useResetPassword } from "@/hooks/authService";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 
-function VerifyEmail() {
+function ChangePassword() {
+  const { token } = useParams(); // Extract token from URL
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const resetPassword = useResetPassword(); // Use reset password mutation
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`Verification email sent to: ${email}`);
+    resetPassword.mutate({ email, token, password, confirmPassword });
   };
 
   return (
@@ -26,15 +33,32 @@ function VerifyEmail() {
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
           <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
+            Email
+          </label>
+          <input
+            className="block w-full px-4 py-3 text-gray-700 dark:text-gray-300 bg-white border rounded-lg dark:bg-gray-900 dark:border-gray-600 focus:border-green-500 focus:ring focus:ring-green-300 focus:outline-none"
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
             New Password
           </label>
           <input
             className="block w-full px-4 py-3 text-gray-700 dark:text-gray-300 bg-white border rounded-lg dark:bg-gray-900 dark:border-gray-600 focus:border-green-500 focus:ring focus:ring-green-300 focus:outline-none"
             type="password"
-            placeholder=" Enter new Password"
-            aria-label="Password"
+            placeholder="Enter new Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
           />
         </div>
+
         <div className="mb-6">
           <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
             Confirm New Password
@@ -43,20 +67,24 @@ function VerifyEmail() {
             className="block w-full px-4 py-3 text-gray-700 dark:text-gray-300 bg-white border rounded-lg dark:bg-gray-900 dark:border-gray-600 focus:border-green-500 focus:ring focus:ring-green-300 focus:outline-none"
             type="password"
             placeholder="Confirm Password"
-            aria-label="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
           />
         </div>
+
         <button
           type="submit"
           className="w-full bg-green-600 text-white py-3 rounded-lg shadow-md hover:bg-green-700 transition text-lg font-semibold"
+          disabled={resetPassword.isLoading}
         >
-          Submit
+          {resetPassword.isLoading ? "Submitting..." : "Submit"}
         </button>
       </form>
 
       <div className="text-center mt-6">
         <a
-          href="login"
+          href="/login"
           className="text-sm text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-400"
         >
           Back
@@ -66,4 +94,4 @@ function VerifyEmail() {
   );
 }
 
-export default VerifyEmail;
+export default ChangePassword;

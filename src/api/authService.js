@@ -30,6 +30,41 @@ const AuthService = {
   },
 
   /**
+   * Forgot Password function - Sends a reset link to the user's email
+   */
+  forgotPassword: async (email) => {
+    try {
+      const clientUri = "http://localhost:5173/changePass"; // Your client URI
+      const response = await axiosClient.post("Auth/ForgetPassword", {
+        email,
+        clientUri,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Forgot Password Error:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Reset Password function - Resets the user's password with a new one
+   */
+  resetPassword: async ({ email, token, password, confirmPassword }) => {
+    try {
+      const response = await axiosClient.post("Auth/resstpassword", {
+        email,
+        token,
+        password,
+        confirmPassword,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Reset Password Error:", error);
+      throw error;
+    }
+  },
+
+  /**
    * Logout function - Removes tokens and redirects to login
    */
   logout: () => {
