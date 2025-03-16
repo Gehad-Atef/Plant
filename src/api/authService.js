@@ -10,6 +10,7 @@ const AuthService = {
   login: async (credentials) => {
     try {
       const response = await axiosClient.post("Auth", credentials);
+      console.log("response.data", response.data);
       return response.data;
     } catch (error) {
       console.error("Login Error:", error);

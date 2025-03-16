@@ -5,8 +5,8 @@ import { Link } from "react-router-dom";
 
 const Login = () => {
   const { mutate: login, isLoading, error } = useLogin(); // Login mutation hook
-  const [email, setEmail] = useState("aya.123.aly.5@gmail.com");
-  const [password, setPassword] = useState("Aya512!!");
+  const [email, setEmail] = useState("anashany219@gmail.com");
+  const [password, setPassword] = useState("123456Aa*");
 
   // Handle form submission
   const handleSubmit = (e) => {
