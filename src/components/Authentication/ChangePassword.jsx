@@ -1,17 +1,24 @@
 import { useResetPassword } from "@/hooks/authService";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 function ChangePassword() {
-  const { token } = useParams(); // Extract token from URL
-  const [email, setEmail] = useState("");
+  const [searchParams] = useSearchParams(); // Get query parameters
+  const token = searchParams.get("token"); // Extract token
+  const email = searchParams.get("email"); // Extract email
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const resetPassword = useResetPassword(); // Use reset password mutation
-
+  console.log({ email, token, password, confirmPassword });
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!token || !email) {
+      return alert("Invalid or missing token and email.");
+    }
+
     resetPassword.mutate({ email, token, password, confirmPassword });
   };
 
@@ -31,20 +38,6 @@ function ChangePassword() {
       </h2>
 
       <form onSubmit={handleSubmit}>
-        <div className="mb-6">
-          <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
-            Email
-          </label>
-          <input
-            className="block w-full px-4 py-3 text-gray-700 dark:text-gray-300 bg-white border rounded-lg dark:bg-gray-900 dark:border-gray-600 focus:border-green-500 focus:ring focus:ring-green-300 focus:outline-none"
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-
         <div className="mb-6">
           <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
             New Password

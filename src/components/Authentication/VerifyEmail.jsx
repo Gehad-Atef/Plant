@@ -2,12 +2,12 @@ import { useForgotPassword } from "@/hooks/authService";
 import { useState } from "react";
 
 function VerifyEmail() {
-  const [email, setEmail] = useState("");
-  const forgotPassword = useForgotPassword(); // Use forgot password mutation
+  const [email, setEmail] = useState("aya.123.aly.5@gmail.com");
+  const { mutate: forgotPassword, isPending } = useForgotPassword(); // Use forgot password mutation
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    forgotPassword.mutate(email); // Call the forgot password function
+    forgotPassword(email); // Call the forgot password function
   };
 
   return (
@@ -43,9 +43,9 @@ function VerifyEmail() {
         <button
           type="submit"
           className="w-full bg-green-600 text-white py-3 rounded-lg shadow-md hover:bg-green-700 transition text-lg font-semibold"
-          disabled={forgotPassword.isLoading} // Disable button while loading
+          disabled={isPending} // Disable button while loading
         >
-          {forgotPassword.isLoading ? "Sending..." : "Verify"}
+          {isPending ? "Sending..." : "Verify"}
         </button>
       </form>
 

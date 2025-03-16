@@ -10,7 +10,6 @@ const AuthService = {
   login: async (credentials) => {
     try {
       const response = await axiosClient.post("Auth", credentials);
-      console.log("response.data", response.data);
       return response.data;
     } catch (error) {
       console.error("Login Error:", error);
@@ -40,6 +39,7 @@ const AuthService = {
         email,
         clientUri,
       });
+      console.log("forgotPassword", response.data);
       return response.data;
     } catch (error) {
       console.error("Forgot Password Error:", error);
@@ -58,6 +58,7 @@ const AuthService = {
         password,
         confirmPassword,
       });
+      console.log("resetPassword", response.data);
       return response.data;
     } catch (error) {
       console.error("Reset Password Error:", error);
