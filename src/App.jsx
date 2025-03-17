@@ -23,11 +23,11 @@ function App() {
       {/* 🏆 Public Routes - Accessible only if NOT logged in */}
       <Route element={<PublicGuard />}>
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
 
         <Route element={<AuthLayout />}>
-          <Route path="/signup" element={<SignUp />} />
           <Route path="/email" element={<VerifyEmail />} />
-          <Route path="/forgot-password" element={<ChangePassword />} />
+          <Route path="/changePass" element={<ChangePassword />} />
         </Route>
       </Route>
 

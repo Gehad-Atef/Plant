@@ -21,7 +21,7 @@ const AuthLayout = () => {
         </motion.button>
 
         {/* ✅ Dark Mode Toggle */}
-        <motion.button
+        {/* <motion.button
           onClick={toggleDarkMode}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -38,7 +38,7 @@ const AuthLayout = () => {
               <Moon className="w-5 h-5" />
             )}
           </motion.div>
-        </motion.button>
+        </motion.button> */}
 
         {/* Outlet for Login/Signup */}
         <Outlet />

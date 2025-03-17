@@ -154,10 +154,12 @@ export const useForgotPassword = () => {
  * Hook for Reset Password - Completes the password reset process
  */
 export const useResetPassword = () => {
+  const navigate = useNavigate();
   return useMutation({
     mutationFn: AuthService.resetPassword,
     onSuccess: () => {
       toast.success("Password reset successfully! You can now log in.");
+      navigate("/login");
     },
     onError: () => {
       toast.error("Failed to reset password.");

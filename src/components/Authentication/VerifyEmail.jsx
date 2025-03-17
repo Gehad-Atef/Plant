@@ -1,5 +1,6 @@
 import { useForgotPassword } from "@/hooks/authService";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function VerifyEmail() {
   const [email, setEmail] = useState("aya.123.aly.5@gmail.com");
@@ -49,13 +50,17 @@ function VerifyEmail() {
         </button>
       </form>
 
+      {/* Back to Login */}
       <div className="text-center mt-6">
-        <a
-          href="/login"
-          className="text-sm text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-400"
+        <p className="text-gray-700 dark:text-gray-300 text-lg">
+          Back to log in?
+        </p>
+        <Link
+          to="/login"
+          className="text-green-500 hover:text-green-700 dark:text-green-400 font-medium"
         >
-          Back
-        </a>
+          Log in
+        </Link>
       </div>
     </div>
   );

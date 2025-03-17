@@ -12,7 +12,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "aya.123.aly.5@gmail.com",
-    password: "123456Aa*",
+    password: "112233Ay#",
   });
 
   const handleSubmit = (e) => {
@@ -113,8 +113,8 @@ const Login = () => {
             {/* Remember Me & Forgot Password */}
             <div className="flex justify-end items-center">
               <Link
-                to="/forgot-password"
-                className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400"
+                to="/email"
+                className="text-green-500 hover:text-green-700 dark:text-green-400 font-medium"
               >
                 Forgot Password?
               </Link>
@@ -123,7 +123,7 @@ const Login = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+              className="w-full py-3 px-4 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors"
             >
               {isPending ? (
                 <Loader2 className="animate-spin mx-auto" size={20} />
@@ -137,7 +137,7 @@ const Login = () => {
               Don&apos;t have an account?{" "}
               <Link
                 to="/signup"
-                className="text-blue-500 hover:text-blue-700 dark:text-blue-400 font-medium"
+                className="text-green-500 hover:text-green-700 dark:text-green-400 font-medium"
               >
                 Create account
               </Link>
