@@ -8,7 +8,7 @@ const AuthLayout = () => {
   const { darkMode, toggleDarkMode } = useTheme();
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-100 via-green-300 to-green-700 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br bg-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="relative w-full max-w-md mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-8">
         {/* Close Button */}
         <motion.button
