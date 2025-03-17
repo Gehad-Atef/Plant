@@ -14,14 +14,18 @@ export const useLogin = () => {
     mutationFn: AuthService.login,
     onSuccess: (data) => {
       if (data.isSuccess) {
-        // ✅ Fetch fresh user data instead of relying on localStorage
-        queryClient.invalidateQueries(["userProfile"]);
+        // ✅ Save user data in localStorage to persist after refresh
+        localStorage.setItem("user", JSON.stringify(data.value));
 
         // ✅ Update user state globally
         setUser(data.value);
 
+        // ✅ Invalidate & refetch user data
+        queryClient.setQueryData(["userProfile"], data.value); // Set the latest user data
+        queryClient.invalidateQueries(["userProfile"]); // Ensure fresh data on next fetch
+
         // 🎉 Show Success Toast
-        toast.success(`Welcome back, ${data.value.firstName}!`);
+        toast.success(`Welcome back, ${data.value.fristName}!`);
 
         // ✅ Navigate to home after login
         navigate("/");
@@ -127,6 +131,38 @@ export const useChangePassword = () => {
     },
     onError: () => {
       toast.error("Failed to change password.");
+    },
+  });
+};
+
+/**
+ * Hook for Forgot Password - Sends an email with a reset link
+ */
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: AuthService.forgotPassword,
+    onSuccess: () => {
+      toast.success("Password reset email sent! Check your inbox.");
+    },
+    onError: () => {
+      toast.error("Failed to send password reset email.");
+    },
+  });
+};
+
+/**
+ * Hook for Reset Password - Completes the password reset process
+ */
+export const useResetPassword = () => {
+  const navigate = useNavigate();
+  return useMutation({
+    mutationFn: AuthService.resetPassword,
+    onSuccess: () => {
+      toast.success("Password reset successfully! You can now log in.");
+      navigate("/login");
+    },
+    onError: () => {
+      toast.error("Failed to reset password.");
     },
   });
 };

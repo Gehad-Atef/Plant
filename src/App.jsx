@@ -22,9 +22,12 @@ function App() {
     <Routes>
       {/* 🏆 Public Routes - Accessible only if NOT logged in */}
       <Route element={<PublicGuard />}>
-        <Route element={<AuthL ayout />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+
+        <Route element={<AuthLayout />}>
+          <Route path="/email" element={<VerifyEmail />} />
+          <Route path="/changePass" element={<ChangePassword />} />
         </Route>
       </Route>
 
@@ -35,12 +38,6 @@ function App() {
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/payment" element={<Checkout />} />
-      </Route>
-
-      {/* ✅ Always Public Pages */}
-      <Route element={<AuthLayout />}>
-        <Route path="/email" element={<VerifyEmail />} />
-        <Route path="/changePass" element={<ChangePassword />} />
       </Route>
 
       {/* 🔐 Protected Routes - Require Authentication */}

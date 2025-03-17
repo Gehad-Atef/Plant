@@ -1,11 +1,14 @@
+import { useForgotPassword } from "@/hooks/authService";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function VerifyEmail() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("aya.123.aly.5@gmail.com");
+  const { mutate: forgotPassword, isPending } = useForgotPassword(); // Use forgot password mutation
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`Verification email sent to: ${email}`);
+    forgotPassword(email); // Call the forgot password function
   };
 
   return (
@@ -41,18 +44,23 @@ function VerifyEmail() {
         <button
           type="submit"
           className="w-full bg-green-600 text-white py-3 rounded-lg shadow-md hover:bg-green-700 transition text-lg font-semibold"
+          disabled={isPending} // Disable button while loading
         >
-          Verify
+          {isPending ? "Sending..." : "Verify"}
         </button>
       </form>
 
+      {/* Back to Login */}
       <div className="text-center mt-6">
-        <a
-          href="login"
-          className="text-sm text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-400"
+        <p className="text-gray-700 dark:text-gray-300 text-lg">
+          Back to log in?
+        </p>
+        <Link
+          to="/login"
+          className="text-green-500 hover:text-green-700 dark:text-green-400 font-medium"
         >
-          Back
-        </a>
+          Log in
+        </Link>
       </div>
     </div>
   );
