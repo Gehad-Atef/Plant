@@ -11,6 +11,7 @@ import ChangePassword from "./components/Authentication/ChangePassword";
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "./components/HomePage";
 import AboutUs from "./components/AboutUs";
+import Categories from "./components/Categories";
 import ContactUs from "./components/ContactUs";
 import ProfileCard from "./components/Profile";
 
@@ -35,6 +36,7 @@ function App() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutUs />} />
+        <Route path="/Categories" element={<Categories />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/payment" element={<Checkout />} />
