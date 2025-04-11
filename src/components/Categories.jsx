@@ -9,10 +9,8 @@ const Categories = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const categoryResponse = await fetch(
-          "https://api.example.com/categories"
-        );
-        const productResponse = await fetch("https://api.example.com/products");
+        const categoryResponse = await fetch("https://localhost:7286/Category");
+        const productResponse = await fetch("https://localhost:7286/api/Plant");
 
         if (!categoryResponse.ok || !productResponse.ok) {
           throw new Error("Failed to fetch data");
@@ -21,8 +19,12 @@ const Categories = () => {
         const categoryData = await categoryResponse.json();
         const productData = await productResponse.json();
 
-        setCategories(categoryData);
-        setProducts(productData);
+        console.log("Fetched categoryData:", categoryData);
+        console.log("Fetched productData:", productData);
+
+        // Ensure both are arrays
+        setCategories(Array.isArray(categoryData) ? categoryData : []);
+        setProducts(Array.isArray(productData) ? productData : []);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -69,25 +71,26 @@ const Categories = () => {
         Categories
       </h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {categories.map((category, index) => (
-          <div
-            key={category.id || index}
-            className="bg-gray-100 dark:bg-gray-700 rounded-lg flex flex-col items-center p-4 hover:shadow-lg transition"
-          >
-            <img
-              src={category.image}
-              alt={category.name}
-              className="w-40 h-40 object-cover rounded-md mb-4"
-              loading="lazy"
-            />
-            <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
-              {category.name}
-            </h2>
-            <button className="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition">
-              Shop Now
-            </button>
-          </div>
-        ))}
+        {Array.isArray(categories) &&
+          categories.map((category, index) => (
+            <div
+              key={category.id || index}
+              className="bg-gray-100 dark:bg-gray-700 rounded-lg flex flex-col items-center p-4 hover:shadow-lg transition"
+            >
+              <img
+                src={category.imagePath}
+                alt={category.name}
+                className="w-40 h-40 object-cover rounded-md mb-4"
+                loading="lazy"
+              />
+              <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+                {category.name}
+              </h2>
+              <button className="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition">
+                Shop Now
+              </button>
+            </div>
+          ))}
       </div>
 
       {/* Featured Products Section */}
@@ -101,7 +104,7 @@ const Categories = () => {
             className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 flex flex-col items-center hover:shadow-xl transition"
           >
             <img
-              src={product.image}
+              src={product.imageUrl}
               alt={product.name}
               className="w-40 h-40 object-cover rounded-md mb-4"
               loading="lazy"

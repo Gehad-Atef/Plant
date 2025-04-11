@@ -17,6 +17,8 @@ import ProfileCard from "./components/Profile";
 
 import Cart from "./components/Cart";
 import Checkout from "./components/Checkout";
+import PlantList from "./components/plants/PlantList";
+import PlantDetail from "./components/plants/PlantDetail";
 
 function App() {
   return (
@@ -40,6 +42,8 @@ function App() {
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/payment" element={<Checkout />} />
+        <Route path="/product" element={<PlantList />} />
+        <Route path="/plant/:id" element={<PlantDetail />} />
       </Route>
 
       {/* 🔐 Protected Routes - Require Authentication */}
