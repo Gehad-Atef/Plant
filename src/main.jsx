@@ -13,6 +13,7 @@ import { ThemeProvider } from "./context/ThemeProvider.jsx";
 import "./index.css";
 import App from "./App.jsx";
 import CustomToaster from "./components/ui/CustomToaster.jsx";
+import { SearchProvider } from "./context/SearchProvider.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -24,8 +25,10 @@ createRoot(document.getElementById("root")).render(
         <BrowserRouter>
           <ThemeProvider>
             <UserProvider>
-              <App />
-              <CustomToaster />
+              <SearchProvider>
+                <App />
+                <CustomToaster />
+              </SearchProvider>
             </UserProvider>
           </ThemeProvider>
         </BrowserRouter>

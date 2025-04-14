@@ -10,6 +10,8 @@ import {
 import { Menu, X, ShoppingCart, User, Search, Sun, Moon } from "lucide-react";
 import { useTheme } from "../context/ThemeProvider";
 import { useUserContext } from "../context/UserProvider";
+import { useContext } from "react";
+import { SearchContext } from "@/context/SearchProvider";
 
 const Navbar = () => {
   const { darkMode, toggleDarkMode } = useTheme();
@@ -19,6 +21,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { scrollY } = useScroll();
+  const { setShowSearch } = useContext(SearchContext);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 50);
@@ -98,7 +101,10 @@ const Navbar = () => {
           {/* Interactive Search with expand animation */}
           <motion.div whileHover={{ scale: 1.05 }} className="relative">
             <motion.button className="p-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400">
-              <Search className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+              <Search
+                className="w-5 h-5 text-gray-700 dark:text-gray-300"
+                onClick={() => setShowSearch(true)}
+              />
             </motion.button>
           </motion.div>
 
