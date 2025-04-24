@@ -14,11 +14,14 @@ import AboutUs from "./components/AboutUs";
 import Categories from "./components/Categories";
 import ContactUs from "./components/ContactUs";
 import ProfileCard from "./components/Profile";
+import Community from "./components/Community";
+import CategoryPage from "./components/CategoryPage";
 
 import Cart from "./components/Cart";
 import Checkout from "./components/Checkout";
 import PlantList from "./components/plants/PlantList";
 import PlantDetail from "./components/plants/PlantDetail";
+import AddPost from "./components/Community/AddPost";
 
 function App() {
   return (
@@ -39,11 +42,14 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/Categories" element={<Categories />} />
+        <Route path="/category/:categoryId" element={<CategoryPage />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/payment" element={<Checkout />} />
         <Route path="/product" element={<PlantList />} />
         <Route path="/plant/:id" element={<PlantDetail />} />
+        <Route path="/community" element={<Community />} />
+        <Route path="/community/new" element={<AddPost />} />
       </Route>
 
       {/* 🔐 Protected Routes - Require Authentication */}

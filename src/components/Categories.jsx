@@ -1,33 +1,36 @@
 import { useEffect, useState } from "react";
-import heroImage from "../assets/Images/image.png"; // Replace with your actual image path
-import featuredImage1 from "../assets/Images/UltimateGuide.png";
-import featuredImage2 from "../assets/Images/BestPlant.png";
+import { useNavigate } from "react-router-dom";
+
+// Helper function to handle image paths
+const getFullImageUrl = (url) => {
+  if (!url) return "https://via.placeholder.com/400x300"; // Fallback image
+  return url; // Return the URL as-is
+};
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   // Fetch categories and products
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
+
         // Fetch categories
         const categoryResponse = await fetch("https://localhost:7286/Category");
-        if (!categoryResponse.ok) {
-          throw new Error("Failed to fetch categories");
-        }
+        if (!categoryResponse.ok) throw new Error("Failed to fetch categories");
         const categoryData = await categoryResponse.json();
-        setCategories(categoryData.value.items);
+        setCategories(categoryData.value.items || []);
 
         // Fetch products
         const productResponse = await fetch("https://localhost:7286/api/Plant");
-        if (!productResponse.ok) {
-          throw new Error("Failed to fetch products");
-        }
+        if (!productResponse.ok) throw new Error("Failed to fetch products");
         const productData = await productResponse.json();
-        setProducts(productData.value.items);
+        setProducts(productData.value.items || []);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -71,7 +74,10 @@ const Categories = () => {
             exploring different species and their benefits. Your ultimate
             destination for nature and gardening enthusiasts.
           </p>
-          <button className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300">
+          <button
+            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300"
+            onClick={() => navigate("/shop")}
+          >
             Shop Now
           </button>
         </div>
@@ -79,7 +85,7 @@ const Categories = () => {
         {/* Right Column: Image */}
         <div className="w-full md:w-1/2 relative overflow-hidden rounded-2xl">
           <img
-            src={heroImage} // Replace with the actual path to your image
+            src="/src/assets/Images/image.png" // Replace with actual image path
             alt="Hero Plant"
             className="w-full h-full object-cover"
             style={{ aspectRatio: "1 / 1" }} // Ensures a square aspect ratio
@@ -94,25 +100,12 @@ const Categories = () => {
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
           {categories.length > 0 ? (
-            categories.map((category, index) => (
-              <div
-                key={category.id || index}
-                className="group bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition duration-300"
-              >
-                <img
-                  src={category.imagePath || "placeholder.jpg"}
-                  alt={category.name}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-green-800 dark:text-white mb-2">
-                    {category.name}
-                  </h3>
-                  <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-300 w-full">
-                    Shop Now
-                  </button>
-                </div>
-              </div>
+            categories.map((category) => (
+              <CategoryCard
+                key={category.id}
+                category={category}
+                navigate={navigate}
+              />
             ))
           ) : (
             <p className="col-span-full text-center text-gray-700 dark:text-gray-300">
@@ -129,30 +122,12 @@ const Categories = () => {
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.length > 0 ? (
-            products.map((product, index) => (
-              <div
-                key={product.id || index}
-                className="group bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition duration-300"
-              >
-                <img
-                  src={product.imageUrl || "placeholder.jpg"}
-                  alt={product.name}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-green-800 dark:text-white mb-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-green-600 dark:text-green-400 font-bold text-lg mb-2">
-                    ${product.price}
-                  </p>
-                  {product.is_Available && (
-                    <span className="bg-green-600 text-white px-2 py-1 rounded-full text-xs">
-                      Available
-                    </span>
-                  )}
-                </div>
-              </div>
+            products.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                navigate={navigate}
+              />
             ))
           ) : (
             <p className="col-span-full text-center text-gray-700 dark:text-gray-300">
@@ -168,46 +143,93 @@ const Categories = () => {
           Featured Articles
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition duration-300">
-            <img
-              src={featuredImage1}
-              alt="Featured Article"
-              className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-green-800 dark:text-white mb-4">
-                The Ultimate Guide to Low-Maintenance Houseplants
-              </h3>
-              <p className="text-gray-700 dark:text-gray-300 mb-6">
-                Discover how to care for low-maintenance houseplants that thrive
-                indoors with minimal effort.
-              </p>
-              <button className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300">
-                Read More
-              </button>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition duration-300">
-            <img
-              src={featuredImage2}
-              alt="Featured Article"
-              className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-green-800 dark:text-white mb-4">
-                Best Plants for Improving Air Quality in Your Home
-              </h3>
-              <p className="text-gray-700 dark:text-gray-300 mb-6">
-                Learn about the top plants that naturally purify the air and
-                create a healthier living environment.
-              </p>
-              <button className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300">
-                Read More
-              </button>
-            </div>
-          </div>
+          <ArticleCard
+            title="The Ultimate Guide to Low-Maintenance Houseplants"
+            description="Discover how to care for low-maintenance houseplants that thrive indoors with minimal effort."
+            image="/src/assets/Images/UltimateGuide.png" // Replace with actual image path
+          />
+          <ArticleCard
+            title="Best Plants for Improving Air Quality in Your Home"
+            description="Learn about the top plants that naturally purify the air and create a healthier living environment."
+            image="/src/assets/Images/BestPlant.png" // Replace with actual image path
+          />
         </div>
       </section>
+    </div>
+  );
+};
+
+// Reusable Category Card Component
+const CategoryCard = ({ category, navigate }) => {
+  return (
+    <div
+      className="group bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition duration-300"
+      onClick={() => navigate(`/category/${category.id}`)}
+    >
+      <img
+        src={getFullImageUrl(category.imagePath)}
+        alt={category.name}
+        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+      />
+      <div className="p-4">
+        <h3 className="text-lg font-semibold text-green-800 dark:text-white mb-2">
+          {category.name}
+        </h3>
+        <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-300 w-full">
+          Shop Now
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Reusable Product Card Component
+const ProductCard = ({ product, navigate }) => {
+  return (
+    <div
+      className="group bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition duration-300"
+      onClick={() => navigate(`/plant/${product.id}`)}
+    >
+      <img
+        src={getFullImageUrl(product.imageUrl)}
+        alt={product.name}
+        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+      />
+      <div className="p-4">
+        <h3 className="text-lg font-semibold text-green-800 dark:text-white mb-2">
+          {product.name}
+        </h3>
+        <p className="text-green-600 dark:text-green-400 font-bold text-lg mb-2">
+          ${product.price.toFixed(2)}
+        </p>
+        {product.is_Available && (
+          <span className="bg-green-600 text-white px-2 py-1 rounded-full text-xs">
+            Available
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Reusable Article Card Component
+const ArticleCard = ({ title, description, image }) => {
+  return (
+    <div className="bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition duration-300">
+      <img
+        src={image}
+        alt={title}
+        className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+      />
+      <div className="p-6">
+        <h3 className="text-xl font-bold text-green-800 dark:text-white mb-4">
+          {title}
+        </h3>
+        <p className="text-gray-700 dark:text-gray-300 mb-6">{description}</p>
+        <button className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300">
+          Read More
+        </button>
+      </div>
     </div>
   );
 };

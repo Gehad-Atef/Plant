@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+// Helper function to handle image paths
+const getFullImageUrl = (url) => {
+  if (!url) return "https://via.placeholder.com/400x300"; // Fallback image
+  return url; // Return the URL as-is
+};
+
 const PlantDetail = () => {
   const [plant, setPlant] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -55,9 +61,13 @@ const PlantDetail = () => {
           {/* Left Column: Image Carousel */}
           <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
             <img
-              src={plant.imageUrl || "placeholder.jpg"}
+              src={getFullImageUrl(plant.imageUrl)} // Handle broken images
               alt={plant.name}
               className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-300"
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/400x300"; // Fallback image
+                e.target.onerror = null;
+              }}
             />
           </div>
 
@@ -69,7 +79,7 @@ const PlantDetail = () => {
                 {plant.name}
               </h2>
               <p className="text-green-600 dark:text-green-400 font-bold text-lg mb-4">
-                Price: ${plant.price}
+                Price: ${plant.price.toFixed(2)}
               </p>
 
               {/* Tabs for Description, How to Plant, and Availability */}
