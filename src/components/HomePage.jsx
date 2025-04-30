@@ -1,10 +1,6 @@
 import { motion } from "framer-motion";
-import { Quote } from "lucide-react";
+import axios from "axios";
 import { useTheme } from "../context/ThemeProvider";
-import indoorPlantImage from "../assets/Images/Indoor.png";
-import outdoorPlantImage from "../assets/Images/Outdoor.png";
-import cactusImage from "../assets/Images/Cactus.png";
-import bonsaiImage from "../assets/Images/Bonsai.png";
 import essentialPlant from "../assets/Images/essentialPlant.png";
 import secondHomePlant from "../assets/Images/secondHomePlant.png";
 import { useState, useEffect } from "react";
@@ -26,60 +22,11 @@ import { FaPinterest } from "react-icons/fa6";
 import { FaInstagram } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { RiShoppingBasket2Line } from "react-icons/ri";
-import TrendyPlant1 from "../assets/Images/TrendyPlant1.png";
-import TrendyPlant2 from "../assets/Images/TrendyPlant2.png";
-import TrendyPlant3 from "../assets/Images/TrendyPlant3.png";
-// Plant categories as an array
-const plantCategories = [
-    { name: "Indoor Plant", image: indoorPlantImage },
-    { name: "Outdoor Plant", image: outdoorPlantImage },
-    { name: "Cactus", image: cactusImage },
-    { name: "Bonsai", image: bonsaiImage },
-];
-const trendyPlans = [
-    {
-        image: TrendyPlant3,
-        title: "Kuwu Potted Faux ",
-        price: "৳700.00",
-    },
+import { FaRegEye } from "react-icons/fa";
+import { useAnimation } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import { useNavigate } from "react-router-dom";
 
-    {
-        image: TrendyPlant2,
-        title: "Calathea Orbifolia",
-        price: "৳700.00",
-    },
-    {
-        image: TrendyPlant3,
-        title: "Kuwu Potted Faux ",
-        price: "৳700.00",
-    },
-    {
-        image: TrendyPlant1,
-        title: " Indoor Houseplant",
-        price: "৳700.00",
-    },
-    {
-        image: TrendyPlant3,
-        title: "Kuwu Potted Faux ",
-        price: "৳700.00",
-    },
-
-    {
-        image: TrendyPlant2,
-        title: "Calathea Orbifolia",
-        price: "৳700.00",
-    },
-    {
-        image: TrendyPlant3,
-        title: "Kuwu Potted Faux ",
-        price: "৳700.00",
-    },
-    {
-        image: TrendyPlant1,
-        title: " Indoor Houseplant",
-        price: "৳700.00",
-    },
-];
 const testimonials = [
     {
         name: "Sara",
@@ -114,14 +61,46 @@ const PlantShop = () => {
         );
     };
     const { darkMode } = useTheme();
-    // const [plants, setPlants] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [trendyPlants, setTrendyPlants] = useState([]);
+    // const [selectedId, setSelectedId] = useState(null);
+    // function handleSelectedId(id) {
+    //     setSelectedId(selectedId);
+    //     console.log(id);
+    // }
     useEffect(() => {
-        fetch("https://plantopia.runasp.net/plants")
-            .then((response) => response.json())
-            .then((data) => console.log(data))
-            .catch((error) => console.error("Error:", error));
+        axios
+            .get("https://greenland.runasp.net/Category")
+            .then((response) => {
+                console.log(response);
+                setCategories(response.data.value.items);
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
     }, []);
+    useEffect(() => {
+        axios
+            .get("https://greenland.runasp.net/api/plant")
+            .then((response) => {
+                setTrendyPlants(response.data.value.items);
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    }, []);
+    const navigate = useNavigate();
+    const controls = useAnimation();
+    const [ref, inView] = useInView({
+        triggerOnce: true,
+        threshold: 0.1,
+    });
 
+    useEffect(() => {
+        if (inView) {
+            controls.start("visible");
+        }
+    }, [controls, inView]);
     return (
         <div
             className={`min-h-screen font-sans transition-colors duration-300 ${
@@ -199,54 +178,102 @@ const PlantShop = () => {
                     Categories
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 place-items-center">
-                    {plantCategories.map((category, index) => (
-                        <PlantCategory key={index} {...category} />
+                    {categories.slice(1, 5).map((category, index) => (
+                        <PlantCategory key={index} category={category} />
                     ))}
+                </div>
+                <div className="flex justify-end mt-7">
+                    <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        className=" bg-gray-400  w-[220px] h-[40px] text-white text-xl rounded-md"
+                        onClick={() => navigate("/Categories")}
+                    >
+                        All Categories
+                    </motion.button>
                 </div>
             </section>
             {/* Trendy Products */}
-            <div
-                className={`w-full h-auto  p-6 pb-[100px] ${
+            <motion.div
+                ref={ref}
+                initial="hidden"
+                animate={controls}
+                variants={{
+                    hidden: { opacity: 0, y: 50 },
+                    visible: {
+                        opacity: 1,
+                        y: 0,
+                        transition: {
+                            when: "beforeChildren",
+                            staggerChildren: 0.05,
+                            duration: 0.4,
+                        },
+                    },
+                }}
+                className={`w-full h-auto p-6 pb-[100px] ${
                     darkMode ? "bg-gray-900 text-white" : "bg-[#F0F9EB]"
                 }`}
             >
-                <h2
-                    className={` my-5 text-[40px] text-center font-semibold mb-10`}
-                >
+                <h2 className="text-[40px] text-center font-bold mb-12 tracking-wide">
                     Trendy Products
                 </h2>
-                <div className="p-3 w-full h-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 justify-items-center">
-                    {trendyPlans.map((item) => (
-                        <div
-                            className={` shadow-lg h-[300px] w-full max-w-[300px]  rounded-lg  flex flex-col ${
-                                darkMode ? "bg-gray-800 " : "  bg-white"
-                            }`}
-                            key={item.title}
-                        >
-                            <div className="w-[80%] mx-[10%] min-h-[220px] flex items-center justify-center">
-                                <img
-                                    src={item.image}
-                                    alt={item.title}
-                                    className="w-[200px] h-[220px] object-contain m-auto"
-                                />
-                            </div>
 
-                            <div className="flex justify-between items-center w-[80%] mx-[10%] h-[60px] text-md md:text-lg">
-                                <div className="w-full flex flex-col justify-center">
-                                    <p className="leading-tight font-semibold  truncate">
-                                        {item.title}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-items-center">
+                    {trendyPlants.map((item) => (
+                        <motion.div
+                            key={item.id}
+                            variants={{
+                                hidden: { opacity: 0, y: 30 },
+                                visible: {
+                                    opacity: 1,
+                                    y: 0,
+                                    transition: {
+                                        duration: 0.3,
+                                    },
+                                },
+                            }}
+                            className={`w-full max-w-[280px] cursor-pointer shadow-md hover:shadow-xl transition-shadow duration-300 rounded-xl flex flex-col overflow-hidden ${
+                                darkMode ? "bg-gray-800 text-white" : "bg-white"
+                            }`}
+                            onClick={() => navigate(`/plant/${item.id}`)}
+                        >
+                            <div
+                                className="w-full h-[200px] bg-cover bg-center"
+                                style={{
+                                    backgroundImage: `url(${item.imageUrl})`,
+                                }}
+                            />
+
+                            <div className="text-center px-4 py-4">
+                                <div className="flex-1">
+                                    <p className="text-lg font-semibold truncate">
+                                        {item.name}
                                     </p>
-                                    <p className=" font-medium">{item.price}</p>
+                                    <p className="text-green-600 font-bold">
+                                        {item.categoryName}
+                                    </p>
                                 </div>
 
-                                <motion.button whileHover={{ scale: 1.1 }}>
-                                    <RiShoppingBasket2Line className="text-3xl p-1 rounded-md text-white bg-[#5AAC38] cursor-pointer  " />
-                                </motion.button>
+                                {/* <div className="flex gap-2 items-center">
+                                    <motion.button
+                                        whileHover={{ scale: 1.2 }}
+                                        className="text-gray-500 hover:text-black transition"
+                                    >
+                                        <FaRegEye className="text-[24px]" />
+                                    </motion.button>
+                                    <motion.button
+                                        whileHover={{ scale: 1.2 }}
+                                        className="text-white bg-green-600 hover:bg-green-700 p-2 rounded-md transition"
+                                        // onClick={() => onSelectedId(item.id)}
+                                    >
+                                        <RiShoppingBasket2Line className="text-[24px]" />
+                                    </motion.button>
+                                </div> */}
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
-            </div>
+            </motion.div>
+
             {/* Deal of the week */}
             <section className="w-auto h-auto p-4">
                 <div className="flex flex-col items-center  w-[60%] m-auto p-4 lg:flex-row lg:justify-between">
@@ -262,18 +289,17 @@ const PlantShop = () => {
                     </div>
                 </div>
                 <div className="w-full grid grid-cols-1 gap-3 place-items-center mt-20 mb-20 md:grid-cols-2 ">
-                    <PlantsDeal
-                        img={Cheery}
-                        title={"Cheery Blossom"}
-                        delPrice={"100 L.E"}
-                        price={"85 L.E"}
-                    />
-                    <PlantsDeal
-                        img={Jasmine}
-                        title={"Jasmine"}
-                        delPrice={"70 L.E"}
-                        price={"45 L.E"}
-                    />
+                    {trendyPlants.slice(5, 7).map((item) => (
+                        <>
+                            <PlantsDeal
+                                img={item.imageUrl}
+                                title={item.name}
+                                delPrice={"20 L.E"}
+                                price={item.price}
+                                id={item.id}
+                            />
+                        </>
+                    ))}
                 </div>
             </section>
 
@@ -283,8 +309,8 @@ const PlantShop = () => {
                     darkMode ? "bg-gray-800 " : "bg-[#F0F9EB]"
                 }`}
             >
-                <div className="flex flex-col justify-between w-[90%] m-auto mb-20 md:flex-row justify-center text-center">
-                    <h2 className="text-3xl font-semibold font-bold mb-6 md:text-5xl">
+                <div className="flex flex-col  w-[90%] m-auto mb-20 md:flex-row justify-between text-center">
+                    <h2 className="text-3xl font-semibold  mb-6 md:text-5xl">
                         What Clients Say!
                     </h2>
                     <div
@@ -326,7 +352,7 @@ const PlantShop = () => {
                         ? "scale-110 p-6 " +
                           (darkMode ? "bg-gray-400" : "bg-green-100")
                         : darkMode
-                        ? "bg-gray-600"
+                        ? "bg-gray-900"
                         : "bg-white"
                 }`}
                         >
@@ -506,41 +532,33 @@ const PlantShop = () => {
 };
 
 //  Category
-const PlantCategory = ({ name, image }) => {
-    const { darkMode } = useTheme();
+const PlantCategory = ({ category }) => {
+    const navigate = useNavigate();
     return (
         <motion.div
             whileHover={{ scale: 1.05 }}
-            className="relative  w-full max-w-[270px] h-[200px] rounded-xl"
+            className="flex bg-slate-400 w-full max-w-[300px] h-[250px] rounded-lg relative"
+            style={{
+                backgroundImage: `url(${category.imagePath})`,
+                backgroundPosition: "center",
+                backgroundSize: "cover",
+            }}
         >
-            <div
-                className="absolute left-0 top-0 w-1/2 h-full  z-20 "
-                style={{
-                    backgroundImage: `url(${image})`,
-                    backgroundPosition: "center",
-                    backgroundSize: "cover",
-                }}
-            ></div>
-            <div
-                className={`absolute bottom-0 w-full h-[120px] flex items-center rounded-lg ${
-                    darkMode ? "bg-[#b5c7ac]" : "bg-[#E8FFDE]"
-                }`}
-            >
-                <div className="absolute right-2">
-                    <h2 className="text-black text-xl font-semibold">{name}</h2>
-                    <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        className="mt-2 bg-green-600 text-white w-[80px] py-1 rounded-lg shadow-md hover:bg-green-700"
-                    >
-                        Shop Now
-                    </motion.button>
-                </div>
+            <div className="absolute w-full h-full bg-[rgb(48,48,48,0.4)] rounded-lg"></div>
+            <div className="absolute left-1/2 top-1/2  transform -translate-x-1/2 -translate-y-1/2 text-center">
+                <h2 className="text-white text-3xl font-semibold whitespace-nowrap">
+                    {category.name}
+                </h2>
+                <button
+                    className="mt-2 bg-green-600 rounded-sm text-white p-1  font-semibold  shadow-md hover:bg-green-700 "
+                    onClick={() => navigate(`/category/${category.id}`)}
+                >
+                    Show Plants
+                </button>
             </div>
         </motion.div>
     );
 };
-
-//  Extracted Newsletter Signup Component
 
 function DivsOfDeal({ number, time }) {
     return (
@@ -550,8 +568,9 @@ function DivsOfDeal({ number, time }) {
         </div>
     );
 }
-function PlantsDeal({ img, title, delPrice, price }) {
+function PlantsDeal({ img, title, delPrice, price, id }) {
     const { darkMode } = useTheme();
+    const navigate = useNavigate();
     return (
         <motion.div
             whileHover={{ scale: 1.05 }}
@@ -577,7 +596,9 @@ function PlantsDeal({ img, title, delPrice, price }) {
                     <del className="text-gray-500 font-semibold">
                         {delPrice}
                     </del>
-                    <span className="font-semibold">&nbsp; &nbsp;{price}</span>
+                    <span className="font-semibold">
+                        &nbsp; &nbsp;{price} L.E
+                    </span>
                 </p>
                 <div className="text-sm leading-[28px] mb-4">
                     <div className="flex items-center gap-2">
@@ -597,11 +618,11 @@ function PlantsDeal({ img, title, delPrice, price }) {
                 <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    className={`bg-[#EDF4F6] rounded-lg w-xl flex items-center gap-2 font-semibold p-1 w-[120px] justify-center 
+                    className={`bg-[#EDF4F6] rounded-lg w-xl flex items-center  font-semibold p-1 w-[120px] justify-center 
                         ${darkMode ? "text-[#5AAC38]" : "text-[#4B633B]"}`}
+                    onClick={() => navigate(`/plant/${id}`)}
                 >
-                    <LuShoppingCart />
-                    Buy Now
+                    Show Details
                 </motion.button>
             </div>
         </motion.div>
