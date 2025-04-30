@@ -4,7 +4,15 @@ import { createContext, useContext, useState } from "react";
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-    const { cart } = useCartQuery();
+    const {
+        cart,
+        isLoading,
+        isError,
+        refetch,
+        addItem,
+        updateItem,
+        deleteItem,
+    } = useCartQuery();
     console.log(cart);
     const [cartItems, setCartItems] = useState([
         {
