@@ -22,6 +22,7 @@ import Checkout from "./components/Checkout";
 import PlantList from "./components/plants/PlantList";
 import PlantDetail from "./components/plants/PlantDetail";
 import AddPost from "./components/Community/AddPost";
+import PlantDiseaseDetector from "./components/plants/PlantDiseaseDetector";
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
         <Route path="/plant/:id" element={<PlantDetail />} />
         <Route path="/community" element={<Community />} />
         <Route path="/community/new" element={<AddPost />} />
+        <Route path="/detect" element={<PlantDiseaseDetector />} />
       </Route>
 
       {/* 🔐 Protected Routes - Require Authentication */}

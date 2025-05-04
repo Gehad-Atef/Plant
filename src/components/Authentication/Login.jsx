@@ -12,7 +12,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "aya.123.aly.5@gmail.com",
-    password: "112233Ay#",
+    password: "04210094Aya#",
   });
 
   const handleSubmit = (e) => {
@@ -40,7 +40,7 @@ const Login = () => {
       </div>
 
       {/* Card Container */}
-      <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+      <div className="flex flex-col md:flex-row w-full max-w-3xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
         {/* Image Section */}
         <div className="hidden md:flex md:w-1/2 relative">
           <img
