@@ -16,20 +16,22 @@ export default function useCartQuery() {
         queryFn: () => getCartItems({ userId: user.id }),
         enabled: !!user?.id,
     });
-    const { mutate: addItem } = useMutation({
+    const { mutateAsync: addItem } = useMutation({
         mutationFn: addToCart,
         onSuccess: () => {
             queryClient.invalidateQueries(["cart"]);
         },
     });
 
-    const { mutate: updateItem } = useMutation({
+    console.log("user inside useCartQuery", user);
+
+    const { mutateAsync: updateItem } = useMutation({
         mutationFn: updateCartItem,
         onSuccess: () => {
             queryClient.invalidateQueries(["cart"]);
         },
     });
-    const { mutate: deleteItem } = useMutation({
+    const { mutateAsync: deleteItem } = useMutation({
         mutationFn: deleteCartItem,
         onSuccess: () => {
             queryClient.invalidateQueries(["cart"]);
