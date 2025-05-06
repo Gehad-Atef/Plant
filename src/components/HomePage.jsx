@@ -127,6 +127,7 @@ const PlantShop = () => {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             className="bg-green-700 text-white px-5 py-2 rounded-xl text-xl hover:bg-green-800 transition block m-auto md:inline"
+                            onClick={() => navigate("/login")}
                         >
                             Join Us
                         </motion.button>
