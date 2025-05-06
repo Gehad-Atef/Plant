@@ -70,8 +70,8 @@ const PlantShop = () => {
     // }
     useEffect(() => {
         axios
-            .get("https://greenland.runasp.net/Category")
-            // .get("https://localhost:7286/Category")
+            // .get("https://greenland.runasp.net/Category")
+            .get("https://localhost:7286/Category")
             .then((response) => {
                 console.log(response);
                 setCategories(response.data.value.items);
@@ -82,8 +82,8 @@ const PlantShop = () => {
     }, []);
     useEffect(() => {
         axios
-            // .get("https://localhost:7286/api/plant")
-            .get("https://greenland.runasp.net/api/plant")
+            .get("https://localhost:7286/api/plant")
+            // .get("https://greenland.runasp.net/api/plant")
             .then((response) => {
                 setTrendyPlants(response.data.value.items);
             })

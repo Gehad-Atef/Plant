@@ -22,8 +22,8 @@ const Categories = () => {
 
                 // Fetch categories
                 const categoryResponse = await fetch(
-                    //"https://localhost:7286/Category"
-                    "https://greenland.runasp.net/Category"
+                    "https://localhost:7286/Category"
+                    // "https://greenland.runasp.net/Category"
                 );
                 if (!categoryResponse.ok)
                     throw new Error("Failed to fetch categories");
@@ -32,8 +32,8 @@ const Categories = () => {
 
                 // Fetch products
                 const productResponse = await fetch(
-                    //"https://localhost:7286/api/plant"
-                    "https://greenland.runasp.net/api/Plant"
+                    "https://localhost:7286/api/plant"
+                    // "https://greenland.runasp.net/api/Plant"
                 );
 
                 if (!productResponse.ok)

@@ -49,10 +49,10 @@ const PlantDetail = () => {
     useEffect(() => {
         const fetchPlant = async () => {
             try {
-                const response = await fetch(
-                    `https://greenland.runasp.net/api/Plant/${id}`
-                );
-                //const response = await fetch(`https://localhost:7286/api/Plant/${id}`);
+                // const response = await fetch(
+                //     `https://greenland.runasp.net/api/Plant/${id}`
+                // );
+                const response = await fetch(`https://localhost:7286/api/Plant/${id}`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch plant details.");
                 }
