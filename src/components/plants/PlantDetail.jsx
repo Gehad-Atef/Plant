@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useCart } from "../../context/CartProvider";
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from "@/context/UserProvider";
+import Swal from "sweetalert2";
 
 // Helper function to handle image paths
 const getFullImageUrl = (url) => {
@@ -18,6 +20,7 @@ const PlantDetail = () => {
     const [quantity, setQuantity] = useState(1);
     const navigate = useNavigate();
     const { id } = useParams(); // Get the plant id from the URL
+    const { user } = useUserContext();
 
     const handleAddToCart = () => {
         const plantWithQuantity = { ...plant, quantity };
@@ -66,12 +69,6 @@ const PlantDetail = () => {
         fetchPlant();
     }, [id]);
 
-    // useEffect(() => {
-    //     const cartItem = cartItems.find((item) => item.id === parseInt(id));
-    //     if (cartItem) {
-    //         setQuantity(cartItem.quantity);
-    //     }
-    // }, [id, cartItems]);
     // Loading state
     if (loading) {
         return (
@@ -227,10 +224,30 @@ const PlantDetail = () => {
                             <div className="space-x-4">
                                 <button
                                     className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300"
-                                    onClick={handleAddToCart}
+                                    onClick={() => {
+                                        if (!user) {
+                                            Swal.fire({
+                                                title: "Please log in first!",
+                                                icon: "warning",
+                                                confirmButtonText: "Close",
+                                                showCancelButton: true,
+                                                cancelButtonText: "Login",
+                                            }).then((result) => {
+                                                if (result.isDismissed) {
+                                                    navigate("/login");
+                                                }
+                                                if (result.isConfirmed) {
+                                                    return;
+                                                }
+                                            });
+                                            return;
+                                        }
+                                        handleAddToCart();
+                                    }}
                                 >
                                     Add to Cart
                                 </button>
+
                                 <button className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition duration-300">
                                     Buy Now
                                 </button>
