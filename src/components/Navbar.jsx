@@ -1,6 +1,7 @@
 // Enhanced Navbar.tsx
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import useNotificationQuery from "../hooks/useNotificationQuery";
 import {
     motion,
     AnimatePresence,
@@ -62,6 +63,8 @@ const Navbar = () => {
     const cartQuantity = cartItems?.length || 0;
     const { data: user } = useProfile();
 
+    const { notifications, isLoading, isError } = useNotificationQuery();
+    const notificationCount = notifications?.length || 0;
     useMotionValueEvent(scrollY, "change", (latest) => {
         setIsScrolled(latest > 50);
     });
@@ -145,16 +148,53 @@ const Navbar = () => {
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <button
-                                            className="p-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400"
+                                            className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400"
                                             aria-label="Notifications"
                                         >
                                             <Bell className="w-5 h-5" />
+                                            {/* الدائرة الحمراء */}
+                                            {notificationCount > 0 && (
+                                                <span className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
+                                                    {notificationCount}
+                                                </span>
+                                            )}
                                         </button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-64">
-                                        <div className="text-sm text-gray-500 dark:text-gray-300">
-                                            No notifications yet.
-                                        </div>
+                                        {isLoading && (
+                                            <div className="text-sm text-gray-500">
+                                                Loading...
+                                            </div>
+                                        )}
+                                        {isError && (
+                                            <div className="text-sm text-red-500">
+                                                Failed to load notifications
+                                            </div>
+                                        )}
+                                        {!isLoading &&
+                                            notifications?.length === 0 && (
+                                                <div className="text-sm text-gray-500">
+                                                    No notifications yet.
+                                                </div>
+                                            )}
+                                        <ul className="space-y-2 max-h-60 overflow-y-auto">
+                                            {notifications?.map((notif) => (
+                                                <li
+                                                    key={notif.id}
+                                                    className="text-sm bg-muted rounded p-2"
+                                                >
+                                                    <p>
+                                                        {notif.message ||
+                                                            "No message"}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {new Date(
+                                                            notif.createdAt
+                                                        ).toLocaleString()}
+                                                    </p>
+                                                </li>
+                                            ))}
+                                        </ul>
                                     </PopoverContent>
                                 </Popover>
                             )}
