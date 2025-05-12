@@ -35,5 +35,24 @@ client.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+// const notiClient = axios.create({
+//     // baseURL: "https://localhost:7286.net/",
+//     baseURL: "https://greenland.runasp.net/api",
+
+//     timeout: 10000,
+//     withCredentials: true,
+//     headers: { "Content-Type": "application/json" },
+// });
+
+// client.interceptors.response.use(
+//     (response) => response,
+//     async (error) => {
+//         console.error("API Request Error:", error);
+
+//         return Promise.reject(error);
+//     }
+// );
+
 export { client };
+// export { notiClient };
 export default axiosClient;

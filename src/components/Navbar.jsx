@@ -62,13 +62,13 @@ const Navbar = () => {
     const { cartItems } = useCart();
     const cartQuantity = cartItems?.length || 0;
     const { data: user } = useProfile();
-
     const { notifications, isLoading, isError } = useNotificationQuery();
-    const notificationCount = notifications?.length || 0;
+    const notificationCount = notifications?.value.length || 0;
+    console.log(notifications, isLoading, isError);
     useMotionValueEvent(scrollY, "change", (latest) => {
         setIsScrolled(latest > 50);
     });
-
+    console.log(notifications);
     useEffect(() => {
         setIsOpen(false);
     }, [location.pathname]);
@@ -152,7 +152,7 @@ const Navbar = () => {
                                             aria-label="Notifications"
                                         >
                                             <Bell className="w-5 h-5" />
-                                            {/* الدائرة الحمراء */}
+
                                             {notificationCount > 0 && (
                                                 <span className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
                                                     {notificationCount}
@@ -172,28 +172,32 @@ const Navbar = () => {
                                             </div>
                                         )}
                                         {!isLoading &&
-                                            notifications?.length === 0 && (
+                                            notifications?.value.length ===
+                                                0 && (
                                                 <div className="text-sm text-gray-500">
                                                     No notifications yet.
                                                 </div>
                                             )}
                                         <ul className="space-y-2 max-h-60 overflow-y-auto">
-                                            {notifications?.map((notif) => (
-                                                <li
-                                                    key={notif.id}
-                                                    className="text-sm bg-muted rounded p-2"
-                                                >
-                                                    <p>
-                                                        {notif.message ||
-                                                            "No message"}
-                                                    </p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        {new Date(
-                                                            notif.createdAt
-                                                        ).toLocaleString()}
-                                                    </p>
-                                                </li>
-                                            ))}
+                                            {notifications &&
+                                                notifications?.value.map(
+                                                    (notif) => (
+                                                        <li
+                                                            key={notif.id}
+                                                            className="text-sm bg-muted rounded p-2"
+                                                        >
+                                                            <p>
+                                                                {notif.message ||
+                                                                    "No message"}
+                                                            </p>
+                                                            <p className="text-xs text-muted-foreground">
+                                                                {new Date(
+                                                                    notif.createdAt
+                                                                ).toLocaleString()}
+                                                            </p>
+                                                        </li>
+                                                    )
+                                                )}
                                         </ul>
                                     </PopoverContent>
                                 </Popover>

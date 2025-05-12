@@ -8,7 +8,7 @@ export const getNotifications = async ({ userId }) => {
     }
 
     try {
-        const response = await client.get(`/Notification`, {
+        const response = await client.get(`api/Notification`, {
             params: { userId },
         });
         console.log("Response data:", response.data);
