@@ -108,13 +108,13 @@ const Cart = () => {
                                     }
                                 >
                                     <img
-                                        src={item.imageUrl}
-                                        alt={item.name}
+                                        src={item.imagePath}
+                                        alt={item.plantName}
                                         className="w-14 h-14 object-cover rounded-md"
                                     />
                                     <div className="flex-1 ml-4">
                                         <p className="text-lg font-bold">
-                                            {item.name}
+                                            {item.plantName}
                                         </p>
                                         <p
                                             className={`text-sm ${
