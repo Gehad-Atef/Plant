@@ -36,9 +36,13 @@ export const addToCart = async ({ userId, plantId, plantName, quantity }) => {
 };
 
 // Update existing item in cart
-export const updateCartItem = async ({ cartId, quantity }) => {
+export const updateCartItem = async ({ userId, itemId, quantity }) => {
     try {
-        const response = await client.post("/cart", { cartId, quantity });
+        const response = await client.put("/cart", {
+            userId,
+            itemId,
+            quantity,
+        });
         return response.data;
     } catch (error) {
         console.error("Error updating cart item:", error);

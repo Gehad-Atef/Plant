@@ -14,9 +14,9 @@ export const CartProvider = ({ children }) => {
         updateItem,
         deleteItem,
     } = useCartQuery();
-    console.log(cart);
     const [cartItems, setCartItems] = useState([]);
     const { user } = useUserContext();
+
     useEffect(() => {
         if (cart) {
             setCartItems(cart);
@@ -59,22 +59,41 @@ export const CartProvider = ({ children }) => {
     };
 
     const increaseQty = (id) => {
-        setCartItems(
-            cartItems.map((item) =>
-                item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-            )
-        );
+        const item = cartItems.find((i) => i.id === id);
+        if (item) {
+            const newQuantity = item.quantity + 1;
+            updateItem({
+                userId: user.id,
+                itemId: id,
+                quantity: newQuantity,
+            }).then(() => {
+                setCartItems(
+                    cartItems.map((i) =>
+                        i.id === id ? { ...i, quantity: newQuantity } : i
+                    )
+                );
+            });
+        }
     };
 
     const decreaseQty = (id) => {
-        setCartItems(
-            cartItems.map((item) =>
-                item.id === id && item.quantity > 1
-                    ? { ...item, quantity: item.quantity - 1 }
-                    : item
-            )
-        );
+        const item = cartItems.find((i) => i.id === id);
+        if (item && item.quantity > 1) {
+            const newQuantity = item.quantity - 1;
+            updateItem({
+                userId: user.id,
+                itemId: id,
+                quantity: newQuantity,
+            }).then(() => {
+                setCartItems(
+                    cartItems.map((i) =>
+                        i.id === id ? { ...i, quantity: newQuantity } : i
+                    )
+                );
+            });
+        }
     };
+
     const updateQuantity = (id, quantity) => {
         setCartItems(
             cartItems.map((item) =>
@@ -82,6 +101,25 @@ export const CartProvider = ({ children }) => {
             )
         );
     };
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex justify-center items-center">
+                <div className="text-xl font-semibold">Loading cart...</div>
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div className="min-h-screen flex justify-center items-center">
+                <div className="text-xl font-semibold text-red-500">
+                    There was an error loading your cart. Please try again.
+                </div>
+            </div>
+        );
+    }
+
     return (
         <CartContext.Provider
             value={{
@@ -91,7 +129,7 @@ export const CartProvider = ({ children }) => {
                 increaseQty,
                 decreaseQty,
                 updateQuantity,
-                isLoading,
+                isLoading, // يمكن استخدامه في مكونات أخرى إذا لزم الأمر
             }}
         >
             {children}

@@ -1,45 +1,18 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCart } from "../context/CartProvider";
 import { FiTrash } from "react-icons/fi";
 import { useTheme } from "../context/ThemeProvider";
 import { Gift, Minus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import useCartQuery from "../hooks/useCartQuery";
-import {
-    getCartItems,
-    addToCart,
-    updateCartItem,
-    deleteCartItem,
-} from "../api/cartService"; // import the services
 
 const Cart = () => {
     const navigate = useNavigate();
     const { darkMode } = useTheme();
-    const {
-        setCartItems,
-        removeFromCart,
-        increaseQty,
-        decreaseQty,
-        cartItems,
-        isLoading,
-    } = useCart();
+    const { removeFromCart, increaseQty, decreaseQty, cartItems, isLoading } =
+        useCart();
     const [promoCode, setPromoCode] = useState("");
     const [isPromoApplied, setIsPromoApplied] = useState(false);
     const [discount, setDiscount] = useState(0);
-    const [userId] = useState("user-id-placeholder"); // Make sure to get the real userId
-
-    // useEffect(() => {
-    //     const fetchCart = async () => {
-    //         try {
-    //             const items = await getCartItems({ userId });
-    //             setCartItems(items); // Store the fetched items in context or state
-    //         } catch (error) {
-    //             console.error("Error fetching cart items:", error);
-    //         }
-    //     };
-
-    //     fetchCart();
-    // }, [userId, setCartItems]);
 
     const handlePayClick = () => {
         navigate("/payment");
@@ -95,6 +68,13 @@ const Cart = () => {
                             <h2 className="text-2xl font-bold mb-4">
                                 Shopping Cart
                             </h2>
+                            {/* {cartItems.length === 0 ? (
+                                <div className="flex justify-center items-center h-[60vh]">
+                                    <div className="text-lg font-semibold text-center">
+                                        Your cart is currently empty
+                                    </div>
+                                </div>
+                            ) : ( */}
                             {cartItems.map((item) => (
                                 <div
                                     key={item.id}
@@ -158,6 +138,13 @@ const Cart = () => {
                                     />
                                 </div>
                             ))}
+                            {/* {cartItems.length === 0 && (
+                                <div className="flex justify-center items-center h-[60vh]">
+                                    <div className="text-lg font-semibold text-center">
+                                        Your cart is currently empty
+                                    </div>
+                                </div>
+                            )} */}
                         </div>
 
                         {/* ✅ Summary Orders - Right */}
