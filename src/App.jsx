@@ -24,6 +24,12 @@ import PlantDetail from "./components/plants/PlantDetail";
 import AddPost from "./components/Community/AddPost";
 import PlantDiseaseDetector from "./components/plants/PlantDiseaseDetector";
 
+// 👇 New Admin Components
+import AdminLayout from "./layouts/AdminLayout";
+import ProductsPage from "./components/Admin/Pages/ProductsPage";
+import CustomersPage from "./components/Admin/Pages/CustomersPage";
+import DashboardPage from "./components/Admin/Pages/DashboardPage";
+
 function App() {
   return (
     <Routes>
@@ -61,9 +67,13 @@ function App() {
         </Route>
       </Route>
 
-      {/* 🛡️ Admin Only Routes */}
+      {/* 🛡️ Admin Routes with Sidebar */}
       <Route element={<RoleGuard allowedRoles={["Admin"]} />}>
-        <Route path="/admin" element={<div>Admin Panel</div>} />
+        <Route path="/dashboard" element={<AdminLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="/dashboard/products" element={<ProductsPage />} />
+          <Route path="/dashboard/customers" element={<CustomersPage />} />
+        </Route>
       </Route>
 
       {/* ❌ Catch-All Route */}
@@ -71,4 +81,5 @@ function App() {
     </Routes>
   );
 }
+
 export default App;

@@ -5,8 +5,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import AuthService from "../api/authService";
 import { useUserContext } from "../context/UserProvider";
 
+import { jwtDecode } from "jwt-decode";
+
 export const useLogin = () => {
-  const { setUser } = useUserContext(); // ✅ Access global user state
+  const { setUser } = useUserContext();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -14,27 +16,38 @@ export const useLogin = () => {
     mutationFn: AuthService.login,
     onSuccess: (data) => {
       if (data.isSuccess) {
-        // ✅ Save user data in localStorage to persist after refresh
-        localStorage.setItem("user", JSON.stringify(data.value));
+        const { token, refreshToken } = data.value;
+        const decoded = jwtDecode(token);
 
-        // ✅ Update user state globally
-        setUser(data.value);
+        const user = {
+          id: data.value.id,
+          email: data.value.email,
+          userName: `${data.value.fristName} ${data.value.lastName}`,
+          role: decoded?.roles?.[0] || "User",
+          imagePath: data.value.imageUrl,
+        };
 
-        // ✅ Invalidate & refetch user data
-        queryClient.setQueryData(["userProfile"], data.value); // Set the latest user data
-        queryClient.invalidateQueries(["userProfile"]); // Ensure fresh data on next fetch
+        // 🧹 إزالة بيانات المستخدم القديم
+        queryClient.removeQueries(["userProfile"], { exact: true });
 
-        // 🎉 Show Success Toast
-        toast.success(`Welcome back, ${data.value.fristName}!`);
+        // ✅ حفظ في localStorage
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("user", JSON.stringify(user));
 
-        // ✅ Navigate to home after login
+        // ✅ تحديث context
+        setUser(user);
+
+        // ✅ إعادة تحميل بيانات البروفايل
+        queryClient.invalidateQueries(["userProfile"]);
+
+        toast.success(`Welcome back, ${user.userName}!`);
+
         navigate("/");
       }
     },
     onError: (error) => {
       console.error("Login Error:", error);
-
-      // ❌ Show Error Toast
       toast.error("Login failed! Please check your credentials.");
     },
   });
@@ -46,19 +59,27 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: AuthService.register,
     onSuccess: () => {
-      // 🎉 Show Success Toast
       toast.success("Account created successfully! Please log in.");
-
-      // ✅ Redirect to login page
       navigate("/login");
     },
     onError: (error) => {
       console.error("Registration Error:", error);
 
-      // ❌ Show Error Toast
-      toast.error(
-        error.response?.data?.message || "Registration failed. Try again!"
-      );
+      // 🔍 حاول استخراج رسائل التحقق من السيرفر
+      const errors = error.response?.data?.errors;
+
+      if (errors && typeof errors === "object") {
+        // عرض كل رسالة خطأ في توست منفصل
+        Object.values(errors).forEach((messages) => {
+          messages.forEach((msg) => toast.error(msg));
+        });
+      } else {
+        // رسالة عامة عند فشل التحقق
+        toast.error(
+          error.response?.data?.message ||
+            "Registration failed. Please check your inputs."
+        );
+      }
     },
   });
 };
@@ -73,22 +94,22 @@ export const useLogout = () => {
       await AuthService.logout();
     },
     onSuccess: () => {
-      // ✅ Remove user from global state
+      // 🧹 حذف بيانات من localStorage
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+
+      // ⬇️ إزالة المستخدم من السياق
       setUser(null);
 
-      // ✅ Invalidate user profile query
-      queryClient.invalidateQueries(["userProfile"]);
+      // 🧹 حذف بيانات الكاش القديم
+      queryClient.removeQueries(["userProfile"], { exact: true });
 
-      // ✅ Show Logout Toast
       toast.success("Logged out successfully!");
-
-      // ✅ Redirect after logout
       navigate("/login");
     },
     onError: (error) => {
       console.error("Logout Error:", error);
-
-      // ❌ Show Error Toast
       toast.error("Logout failed. Please try again!");
     },
   });
@@ -98,10 +119,10 @@ export const useProfile = () => {
   return useQuery({
     queryKey: ["userProfile"],
     queryFn: AuthService.getProfile,
-    // staleTime: 0, // Always refetch on each request
-    // cacheTime: 0, // Prevent caching old user data
-    // refetchOnMount: true, // Refetch when the component mounts
-    // refetchOnWindowFocus: true, // Refetch when user focuses on the window
+    staleTime: 0,
+    cacheTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 };
 
