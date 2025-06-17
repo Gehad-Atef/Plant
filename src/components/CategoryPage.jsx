@@ -65,7 +65,7 @@ const CategoryPage = () => {
 
                 // Fetch plants for the selected category
                 const plantResponse = await fetch(
-                    `https://localhost:7286/Category/${encodeURIComponent(
+                    `https://greenland.runasp.net/Category/${encodeURIComponent(
                         selectedCategory.name
                     )}/plantByCategoryName`
                 );
