@@ -52,7 +52,8 @@ const navRoutes = [
 
 const Navbar = () => {
     const { darkMode, toggleDarkMode } = useTheme();
-    const { isAuthenticated, logout } = useUserContext();
+    // const { isAuthenticated, logout } = useUserContext();
+    const { user, isAuthenticated, logout } = useUserContext();
     const [isOpen, setIsOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const navigate = useNavigate();
@@ -61,14 +62,14 @@ const Navbar = () => {
     const { setShowSearch } = useContext(SearchContext);
     const { cartItems } = useCart();
     const cartQuantity = cartItems?.length || 0;
-    const { data: user } = useProfile();
+    //const { data: user } = useProfile();
+
     const { notifications, isLoading, isError } = useNotificationQuery();
-    const notificationCount = notifications?.value.length || 0;
-    console.log(notifications, isLoading, isError);
+    const notificationCount = notifications?.length || 0;
     useMotionValueEvent(scrollY, "change", (latest) => {
         setIsScrolled(latest > 50);
     });
-    console.log(notifications);
+
     useEffect(() => {
         setIsOpen(false);
     }, [location.pathname]);
@@ -172,32 +173,28 @@ const Navbar = () => {
                                             </div>
                                         )}
                                         {!isLoading &&
-                                            notifications?.value.length ===
-                                                0 && (
+                                            notifications?.length === 0 && (
                                                 <div className="text-sm text-gray-500">
                                                     No notifications yet.
                                                 </div>
                                             )}
                                         <ul className="space-y-2 max-h-60 overflow-y-auto">
-                                            {notifications &&
-                                                notifications?.value.map(
-                                                    (notif) => (
-                                                        <li
-                                                            key={notif.id}
-                                                            className="text-sm bg-muted rounded p-2"
-                                                        >
-                                                            <p>
-                                                                {notif.message ||
-                                                                    "No message"}
-                                                            </p>
-                                                            <p className="text-xs text-muted-foreground">
-                                                                {new Date(
-                                                                    notif.createdAt
-                                                                ).toLocaleString()}
-                                                            </p>
-                                                        </li>
-                                                    )
-                                                )}
+                                            {notifications?.map((notif) => (
+                                                <li
+                                                    key={notif.id}
+                                                    className="text-sm bg-muted rounded p-2"
+                                                >
+                                                    <p>
+                                                        {notif.message ||
+                                                            "No message"}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {new Date(
+                                                            notif.createdAt
+                                                        ).toLocaleString()}
+                                                    </p>
+                                                </li>
+                                            ))}
                                         </ul>
                                     </PopoverContent>
                                 </Popover>
@@ -367,59 +364,69 @@ const ThemeToggle = ({ darkMode, toggle }) => (
     </motion.button>
 );
 
-const UserSection = ({ isAuthenticated, user, onLogout, navigate }) => (
-    <div className="flex items-center gap-2">
-        {isAuthenticated ? (
-            <DropdownMenu>
-                <DropdownMenuTrigger className="focus:outline-none">
-                    <Avatar className="border-2 border-green-300 h-9 w-9">
-                        <AvatarImage
-                            src={user?.imagePath}
-                            className="object-cover"
-                            onError={(e) => {
-                                e.target.style.display = "none";
-                            }}
-                        />
-                        <AvatarFallback className="bg-gray-100 dark:bg-gray-700">
-                            {user?.firstName?.[0] || (
-                                <User className="w-4 h-4" />
-                            )}
-                        </AvatarFallback>
-                    </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                    <div className="px-2 py-1.5 text-sm font-medium truncate">
-                        {user?.userName?.replace(/_/g, " ") || "User Account"}
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                        onClick={() => navigate("/profile")}
-                        className="cursor-pointer"
+const UserSection = ({ isAuthenticated, user, onLogout, navigate }) => {
+    const isAdmin = user?.role === "Admin";
+
+    return (
+        <div className="flex items-center gap-2">
+            {isAuthenticated ? (
+                <DropdownMenu>
+                    <DropdownMenuTrigger className="focus:outline-none">
+                        <Avatar className="border-2 border-green-300 h-9 w-9">
+                            <AvatarImage
+                                src={user?.imagePath}
+                                className="object-cover"
+                                onError={(e) => {
+                                    e.target.style.display = "none";
+                                }}
+                            />
+                            <AvatarFallback className="bg-gray-100 dark:bg-gray-700">
+                                {user?.userName?.[0] || (
+                                    <User className="w-4 h-4" />
+                                )}
+                            </AvatarFallback>
+                        </Avatar>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent align="end" className="w-48">
+                        <div className="px-2 py-1.5 text-sm font-medium truncate">
+                            {user?.userName || "User Account"}
+                        </div>
+
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem
+                            onClick={() =>
+                                navigate(isAdmin ? "/dashboard" : "/profile")
+                            }
+                            className="cursor-pointer"
+                        >
+                            <Settings2 className="w-4 h-4 mr-2" />
+                            {isAdmin ? "Dashboard" : "Profile"}
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                            onClick={onLogout}
+                            className="text-red-600 cursor-pointer dark:text-red-400"
+                        >
+                            <LogOut className="w-4 h-4 mr-2" />
+                            Logout
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ) : (
+                <motion.div whileHover={{ scale: 1.05 }}>
+                    <Link
+                        to="/login"
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        aria-label="Login or Register"
                     >
-                        <Settings2 className="w-4 h-4 mr-2" />
-                        Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                        onClick={onLogout}
-                        className="text-red-600 cursor-pointer dark:text-red-400"
-                    >
-                        <LogOut className="w-4 h-4 mr-2" />
-                        Logout
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-        ) : (
-            <motion.div whileHover={{ scale: 1.05 }}>
-                <Link
-                    to="/login"
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                    aria-label="Login or Register"
-                >
-                    Login
-                </Link>
-            </motion.div>
-        )}
-    </div>
-);
+                        Login
+                    </Link>
+                </motion.div>
+            )}
+        </div>
+    );
+};
 
 export default Navbar;

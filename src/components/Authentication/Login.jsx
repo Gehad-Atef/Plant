@@ -10,10 +10,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { mutate: login, isPending } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "aya.123.aly.5@gmail.com",
-    password: "04210094Aya#",
-  });
+  const [formData, setFormData] = useState({});
 
   const handleSubmit = (e) => {
     e.preventDefault();

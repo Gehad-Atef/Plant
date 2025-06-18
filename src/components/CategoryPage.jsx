@@ -65,7 +65,7 @@ const CategoryPage = () => {
 
                 // Fetch plants for the selected category
                 const plantResponse = await fetch(
-                    `https://greenland.runasp.net/Category/${encodeURIComponent(
+                    `https://localhost:7286/Category/${encodeURIComponent(
                         selectedCategory.name
                     )}/plantByCategoryName`
                 );
@@ -179,3 +179,107 @@ const PlantCard = ({ plant, navigate }) => {
 };
 
 export default CategoryPage;
+
+// const Categories = () => {
+//   const [categories, setCategories] = useState([]);
+//   const [products, setProducts] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const { search: searchQuery } = useContext(SearchContext);
+//   const navigate = useNavigate();
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         setLoading(true);
+
+//         const categoryRes = await fetch("https://localhost:7286/Category");
+//         if (!categoryRes.ok) throw new Error("Failed to fetch categories");
+//         const categoryData = await categoryRes.json();
+
+//         const productRes = await fetch("https://localhost:7286/api/plant");
+//         if (!productRes.ok) throw new Error("Failed to fetch products");
+//         const productData = await productRes.json();
+
+//         setCategories(categoryData.value.items || []);
+//         setProducts(productData.value.items || []);
+//       } catch (err) {
+//         setError(err.message);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchData();
+//   }, []);
+
+//   const filteredCategories = categories.filter((cat) =>
+//     cat.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+//   );
+
+//   const filteredProducts = products.filter((prod) =>
+//     prod.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+//   );
+
+//   if (loading) {
+//     return (
+//       <div className="flex justify-center items-center h-screen">
+//         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-green-600"></div>
+//       </div>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <div className="text-center text-red-500 py-10">
+//         <h1 className="text-2xl font-bold">Oops! Something went wrong.</h1>
+//         <p>{error}</p>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="max-w-screen-xl mx-auto p-6">
+//       {/* باقي الكود بدون تغيير كبير، فقط استبدل categories بـ filteredCategories والـ products بـ filteredProducts */}
+
+//       <section className="mb-12">
+//         <h2 className="text-3xl font-bold text-center text-green-800 dark:text-white mb-8">
+//           Explore Categories
+//         </h2>
+//         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+//           {filteredCategories.length > 0 ? (
+//             filteredCategories.map((category) => (
+//               <CategoryCard
+//                 key={category.id}
+//                 category={category}
+//                 navigate={navigate}
+//               />
+//             ))
+//           ) : (
+//             <p className="col-span-full text-center text-gray-700 dark:text-gray-300">
+//               No categories available.
+//             </p>
+//           )}
+//         </div>
+//       </section>
+
+//       <section className="mb-12">
+//         <h2 className="text-3xl font-bold text-center text-green-800 dark:text-white mb-8">
+//           Featured Plants
+//         </h2>
+//         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+//           {filteredProducts.length > 0 ? (
+//             filteredProducts.map((product) => (
+//               <ProductCard
+//                 key={product.id}
+//                 product={product}
+//                 navigate={navigate}
+//               />
+//             ))
+//           ) : (
+//             <p className="col-span-full text-center text-gray-700 dark:text-gray-300">
+//               No products available.
+//             </p>
+//           )}
+//         </div>
+//       </section>
