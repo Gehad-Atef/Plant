@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-    baseURL: "https://localhost:7286/",
-    // baseURL: "https://greenland.runasp.net",
+    // baseURL: "https://localhost:7286/",
+    baseURL: "https://greenland.runasp.net",
 
     timeout: 10000,
     withCredentials: true,

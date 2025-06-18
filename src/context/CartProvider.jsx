@@ -101,6 +101,9 @@ export const CartProvider = ({ children }) => {
             )
         );
     };
+    const clearCartItems = () => {
+        setCartItems([]);
+    };
 
     if (isLoading) {
         return (
@@ -129,7 +132,8 @@ export const CartProvider = ({ children }) => {
                 increaseQty,
                 decreaseQty,
                 updateQuantity,
-                isLoading, // يمكن استخدامه في مكونات أخرى إذا لزم الأمر
+                isLoading,
+                clearCartItems,
             }}
         >
             {children}

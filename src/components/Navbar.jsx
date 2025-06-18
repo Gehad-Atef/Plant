@@ -60,7 +60,7 @@ const Navbar = () => {
     const location = useLocation();
     const { scrollY } = useScroll();
     const { setShowSearch } = useContext(SearchContext);
-    const { cartItems } = useCart();
+    const { cartItems, clearCartItems } = useCart();
     const cartQuantity = cartItems?.length || 0;
     //const { data: user } = useProfile();
 
@@ -73,7 +73,11 @@ const Navbar = () => {
     useEffect(() => {
         setIsOpen(false);
     }, [location.pathname]);
-
+    const handleLogout = () => {
+        logout();
+        clearCartItems();
+        navigate("/");
+    };
     return (
         <motion.nav
             initial={{ opacity: 0, y: -20 }}
@@ -216,7 +220,7 @@ const Navbar = () => {
                             <UserSection
                                 isAuthenticated={isAuthenticated}
                                 user={user}
-                                onLogout={logout}
+                                onLogout={handleLogout}
                                 navigate={navigate}
                             />
                         </div>

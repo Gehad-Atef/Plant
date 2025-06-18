@@ -83,9 +83,9 @@ const Cart = () => {
                                             ? "border-gray-700 bg-gray-700"
                                             : "border-gray-200 bg-gray-100"
                                     } mb-3`}
-                                    onClick={() =>
-                                        navigate(`/plant/${item.id}`)
-                                    }
+                                    onClick={() => {
+                                        navigate(`/plant/${item.plantId}`);
+                                    }}
                                 >
                                     <img
                                         src={item.imagePath}
