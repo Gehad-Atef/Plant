@@ -12,7 +12,7 @@ export const getNotifications = async ({ userId }) => {
             params: { userId },
         });
         console.log("Response data:", response.data);
-        return response.data;
+        return response.data.value;
     } catch (error) {
         console.error("Error fetching notifications:", error);
         throw error;

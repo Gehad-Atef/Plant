@@ -173,28 +173,31 @@ const Navbar = () => {
                                             </div>
                                         )}
                                         {!isLoading &&
-                                            notifications?.length === 0 && (
+                                            notifications?.items?.length ===
+                                                0 && (
                                                 <div className="text-sm text-gray-500">
                                                     No notifications yet.
                                                 </div>
                                             )}
                                         <ul className="space-y-2 max-h-60 overflow-y-auto">
-                                            {notifications?.map((notif) => (
-                                                <li
-                                                    key={notif.id}
-                                                    className="text-sm bg-muted rounded p-2"
-                                                >
-                                                    <p>
-                                                        {notif.message ||
-                                                            "No message"}
-                                                    </p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        {new Date(
-                                                            notif.createdAt
-                                                        ).toLocaleString()}
-                                                    </p>
-                                                </li>
-                                            ))}
+                                            {notifications?.items?.map(
+                                                (notif) => (
+                                                    <li
+                                                        key={notif.id}
+                                                        className="text-sm bg-muted rounded p-2"
+                                                    >
+                                                        <p>
+                                                            {notif.message ||
+                                                                "No message"}
+                                                        </p>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {new Date(
+                                                                notif.createdAt
+                                                            ).toLocaleString()}
+                                                        </p>
+                                                    </li>
+                                                )
+                                            )}
                                         </ul>
                                     </PopoverContent>
                                 </Popover>

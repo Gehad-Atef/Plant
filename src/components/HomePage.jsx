@@ -63,6 +63,7 @@ const PlantShop = () => {
     const { darkMode } = useTheme();
     const [categories, setCategories] = useState([]);
     const [trendyPlants, setTrendyPlants] = useState([]);
+    console.log(trendyPlants);
     // const [selectedId, setSelectedId] = useState(null);
     // function handleSelectedId(id) {
     //     setSelectedId(selectedId);
@@ -293,15 +294,14 @@ const PlantShop = () => {
                 </div>
                 <div className="w-full grid grid-cols-1 gap-3 place-items-center mt-20 mb-20 md:grid-cols-2 ">
                     {trendyPlants.slice(5, 7).map((item) => (
-                        <>
-                            <PlantsDeal
-                                img={item.imageUrl}
-                                title={item.name}
-                                delPrice={"20 L.E"}
-                                price={item.price}
-                                id={item.id}
-                            />
-                        </>
+                        <PlantsDeal
+                            img={item.imageUrl}
+                            title={item.name}
+                            delPrice={"20 L.E"}
+                            price={item.price}
+                            id={item.id}
+                            key={item.id}
+                        />
                     ))}
                 </div>
             </section>
