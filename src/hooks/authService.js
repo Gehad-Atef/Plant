@@ -77,7 +77,7 @@ export const useRegister = () => {
         // رسالة عامة عند فشل التحقق
         toast.error(
           error.response?.data?.message ||
-            "Registration failed. Please check your inputs."
+          "Registration failed. Please check your inputs."
         );
       }
     },
@@ -91,23 +91,30 @@ export const useLogout = () => {
 
   return useMutation({
     mutationFn: async () => {
+      // 🚀 Revoke token from server (optional but good practice)
       await AuthService.logout();
+
+      // 🚫 Delete `accessToken` cookie manually (in case backend doesn’t clear it)
+      document.cookie =
+        "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Secure; SameSite=None";
     },
+
     onSuccess: () => {
-      // 🧹 حذف بيانات من localStorage
+      // 🧹 Clear all localStorage
       localStorage.removeItem("authToken");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
 
-      // ⬇️ إزالة المستخدم من السياق
+      // ❌ Reset user state
       setUser(null);
 
-      // 🧹 حذف بيانات الكاش القديم
+      // 🧹 Invalidate user-related queries
       queryClient.removeQueries(["userProfile"], { exact: true });
 
       toast.success("Logged out successfully!");
       navigate("/login");
     },
+
     onError: (error) => {
       console.error("Logout Error:", error);
       toast.error("Logout failed. Please try again!");
