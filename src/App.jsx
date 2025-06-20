@@ -29,6 +29,8 @@ import CustomersPage from "./components/Admin/Pages/CustomersPage";
 import DashboardPage from "./components/Admin/Pages/DashboardPage";
 import MyPosts from "./pages/MyPosts";
 import Community from "./pages/Community";
+import Success from "./components/Success";
+import CardDetails from "./components/CardDetails";
 
 function App() {
   return (
@@ -53,6 +55,8 @@ function App() {
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/payment" element={<Checkout />} />
+        <Route path="/card-details" element={<CardDetails />} />
+        <Route path="/success" element={<Success />} />
         <Route path="/product" element={<PlantList />} />
         <Route path="/plant/:id" element={<PlantDetail />} />
         <Route path="/community" element={<Community />} />
