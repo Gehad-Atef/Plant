@@ -96,7 +96,7 @@ export default function PostCard({ post, onPostDeleted }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <img
-            src={`https://localhost:7286${post.imagePathUser}`}
+            src={`https://greenland.runasp.net${post.imagePathUser}`}
             alt="User avatar"
             className="w-10 h-10 rounded-full object-cover"
           />
@@ -112,7 +112,7 @@ export default function PostCard({ post, onPostDeleted }) {
 
       {/* Content */}
       <p className="text-gray-800 dark:text-gray-100">{post.content}</p>
-      {post.imagePath && post.imagePath !== "https://localhost:7286" && (
+      {post.imagePath && post.imagePath !== "https://greenland.runasp.net" && (
         <img
           src={post.imagePath}
           alt="Post"

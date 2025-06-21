@@ -31,6 +31,7 @@ import MyPosts from "./pages/MyPosts";
 import Community from "./pages/Community";
 import Success from "./components/Success";
 import CardDetails from "./components/CardDetails";
+import OrdersPage from "./components/Admin/Pages/OrdersPage";
 
 function App() {
   return (
@@ -77,6 +78,7 @@ function App() {
           <Route index element={<DashboardPage />} />
           <Route path="/dashboard/products" element={<ProductsPage />} />
           <Route path="/dashboard/customers" element={<CustomersPage />} />
+          <Route path="/dashboard/orders" element={<OrdersPage />} />
         </Route>
       </Route>
 
