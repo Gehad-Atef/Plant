@@ -19,11 +19,11 @@ const Categories = () => {
       try {
         setLoading(true);
 
-        const categoryRes = await fetch("https://greenland.runasp.net/Category");
+        const categoryRes = await fetch("https://localhost:7286/Category");
         if (!categoryRes.ok) throw new Error("Failed to fetch categories");
         const categoryData = await categoryRes.json();
 
-        const productRes = await fetch("https://greenland.runasp.net/api/plant");
+        const productRes = await fetch("https://localhost:7286/api/plant");
         if (!productRes.ok) throw new Error("Failed to fetch products");
         const productData = await productRes.json();
 

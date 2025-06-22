@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaCcVisa, FaCcMastercard, FaMoneyBillAlt } from "react-icons/fa";
+import { FaCcVisa, FaCreditCard, FaMoneyBillAlt } from "react-icons/fa";
 import { useTheme } from "../context/ThemeProvider";
 import { useNavigate } from "react-router-dom";
 
@@ -33,13 +33,10 @@ const PaymentMethods = () => {
         address,
         cardDetails: null,
       };
-      console.log(
-        "📦 Sending payload to backend:",
-        JSON.stringify(payload, null, 2)
-      );
+
       try {
         const response = await fetch(
-          "https://greenland.runasp.net/payment/checkout",
+          "https://localhost:7286/payment/checkout",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -145,23 +142,20 @@ const PaymentMethods = () => {
             {[
               {
                 method: "visa",
-                label: "Visa Debit Card",
+                label: "Visa",
                 icon: <FaCcVisa className="text-blue-800 text-xl" />,
-                last4: "5212",
               },
               {
-                method: "mastercard",
-                label: "MasterCard",
-                icon: <FaCcMastercard className="text-red-500 text-xl" />,
-                last4: "8423",
+                method: "creditcard",
+                label: "Credit Card",
+                icon: <FaCreditCard className="text-indigo-600 text-xl" />,
               },
               {
                 method: "cash",
                 label: "Cash on Delivery",
                 icon: <FaMoneyBillAlt className="text-green-600 text-xl" />,
-                last4: "",
               },
-            ].map(({ method, label, icon, last4 }) => (
+            ].map(({ method, label, icon }) => (
               <div
                 key={method}
                 className={`flex items-center justify-between w-full p-3 rounded-lg border cursor-pointer transition-all text-sm ${
@@ -181,9 +175,7 @@ const PaymentMethods = () => {
               >
                 <div className="flex items-center gap-4">
                   <span>{icon}</span>
-                  <p className="font-medium">
-                    {label} {last4 && `•••• ${last4}`}
-                  </p>
+                  <p className="font-medium">{label}</p>
                 </div>
               </div>
             ))}

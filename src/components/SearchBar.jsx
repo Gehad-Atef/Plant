@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { Search, X } from "lucide-react";
 import { SearchContext } from "@/context/SearchProvider";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTheme } from "../context/ThemeProvider"; // ✅ تم إضافة هذا
 
 const SearchBar = () => {
   const { search, setSearch, showSearch, setShowSearch } =
@@ -9,6 +10,7 @@ const SearchBar = () => {
   const [visible, setVisible] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { darkMode } = useTheme(); // ✅ استخدام الوضع الليلي
 
   useEffect(() => {
     const lowerPath = location.pathname.toLowerCase();
@@ -24,7 +26,7 @@ const SearchBar = () => {
     if (!search.trim()) return;
 
     try {
-      const res = await fetch("https://greenland.runasp.net/Category");
+      const res = await fetch("https://localhost:7286/Category");
       const data = await res.json();
       const categories = data.value.items || [];
 
@@ -38,28 +40,40 @@ const SearchBar = () => {
         setSearch("");
         return;
       }
-
-      // If not a category, filtered search will apply on page level using context
     } catch (err) {
       console.error("Failed to fetch categories", err);
     }
   };
 
   return showSearch && visible ? (
-    <div className="border-t border-b bg-white text-center">
+    <div
+      className={`border-t border-b text-center transition-all duration-300 ${
+        darkMode ? "bg-gray-900 border-gray-700" : "bg-white border-gray-300"
+      }`}
+    >
       <form
         onSubmit={handleSubmit}
-        className="inline-flex items-center justify-center border border-gray-400 px-5 py-2 my-5 mx-3 rounded-full w-3/4 sm:w-1/2"
+        className={`inline-flex items-center justify-center px-5 py-2 my-5 mx-3 rounded-full w-3/4 sm:w-1/2 border ${
+          darkMode
+            ? "bg-gray-800 text-white border-gray-600"
+            : "bg-white text-black border-gray-400"
+        }`}
       >
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 outline-none bg-inherit text-sm"
+          className={`flex-1 outline-none bg-inherit text-sm ${
+            darkMode ? "text-white" : "text-black"
+          }`}
           type="text"
           placeholder="Search for plant or category"
         />
         <button type="submit">
-          <Search className="w-4 h-4 text-gray-700" />
+          <Search
+            className={`w-4 h-4 ${
+              darkMode ? "text-gray-300" : "text-gray-700"
+            }`}
+          />
         </button>
       </form>
       <X
@@ -67,7 +81,9 @@ const SearchBar = () => {
           setShowSearch(false);
           setSearch("");
         }}
-        className="inline w-4 h-4 text-gray-700 cursor-pointer"
+        className={`inline w-4 h-4 cursor-pointer ${
+          darkMode ? "text-gray-300" : "text-gray-700"
+        }`}
       />
     </div>
   ) : null;

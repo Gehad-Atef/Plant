@@ -16,14 +16,11 @@ export default function OrdersPage() {
     const token = localStorage.getItem("authToken");
 
     try {
-      const usersRes = await axios.get(
-        "https://greenland.runasp.net/me/GetAll",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const usersRes = await axios.get("https://localhost:7286/me/GetAll", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const users = usersRes.data.value;
       if (!Array.isArray(users)) {
@@ -35,7 +32,7 @@ export default function OrdersPage() {
 
       for (const user of users) {
         const res = await axios.get(
-          `https://greenland.runasp.net/order/user/${user.id}`,
+          `https://localhost:7286/order/user/${user.id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -81,7 +78,7 @@ export default function OrdersPage() {
     try {
       await Promise.all(
         selectedOrders.map((id) =>
-          axios.delete(`https://greenland.runasp.net/order/${id}`, {
+          axios.delete(`https://localhost:7286/order/${id}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },

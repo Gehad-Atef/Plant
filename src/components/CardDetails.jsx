@@ -1,17 +1,32 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "../context/ThemeProvider";
 
 const CardDetails = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { selectedPayment } = state || {};
+  const { darkMode } = useTheme();
 
   const [cardNumber, setCardNumber] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
   const [cvv, setCvv] = useState("");
 
-  const { darkMode } = useTheme();
+  // ✅ تطبيع نوع الدفع
+  const normalizedPaymentMethod =
+    selectedPayment?.toLowerCase() === "visa"
+      ? "Visa"
+      : selectedPayment?.toLowerCase() === "creditcard"
+      ? "CreditCard"
+      : null; // لو مش Visa أو CreditCard → null
+
+  // ❌ لو طريقة غير مدعومة → نرجع خطوة للخلف
+  useEffect(() => {
+    if (!normalizedPaymentMethod) {
+      alert("❌ Only Visa or CreditCard are supported.");
+      navigate(-1);
+    }
+  }, [normalizedPaymentMethod, navigate]);
 
   const handleSubmit = async () => {
     if (!cardNumber || !expirationDate || !cvv) {
@@ -21,51 +36,49 @@ const CardDetails = () => {
 
     const user = JSON.parse(localStorage.getItem("user"));
 
-    // استخدم Object.create للحفاظ على casing الصحيح
-    const cardDetails = Object.create(null);
-    cardDetails.CardNumber = cardNumber;
-    cardDetails.ExpirationDate = expirationDate;
-    cardDetails.CVV = cvv;
-    cardDetails.CardType = selectedPayment;
+    const cardDetails = {
+      CardNumber: cardNumber,
+      ExpirationDate: expirationDate,
+      CVV: cvv,
+      CardType: normalizedPaymentMethod,
+    };
 
     const payload = {
       userId: user?.id,
-      paymentMethod: selectedPayment,
+      paymentMethod: normalizedPaymentMethod,
       address: "Cairo, Egypt",
       cardDetails,
     };
 
-    console.log("🚀 Sending payload:", JSON.stringify(payload, null, 2));
+    console.log("🔍 Sending payload:", payload);
 
     try {
-      const response = await fetch(
-        "https://greenland.runasp.net/payment/checkout",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch("https://localhost:7286/payment/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-      const text = await response.text();
-      let data;
-
-      try {
-        data = JSON.parse(text);
-      } catch (jsonError) {
-        console.error("❌ Invalid JSON from server:", text);
-        alert("🚨 Server error: Invalid response format.");
-        return;
-      }
-
-      if (response.ok && data.success) {
+      if (response.status === 204) {
         alert("✅ Payment Successful!");
         navigate("/success");
       } else {
-        console.error("❌ Backend error:", data);
-        alert(data?.message || "❌ Payment failed. Try again.");
+        const text = await response.text();
+        let errorData = {};
+        try {
+          errorData = JSON.parse(text);
+        } catch (err) {
+          console.error("Invalid error JSON:", text);
+        }
+
+        console.error("❌ Payment failed:", errorData);
+        alert(
+          errorData?.errors?.[0]?.discription ||
+            errorData?.message ||
+            "❌ Payment failed. Try again."
+        );
       }
     } catch (err) {
       console.error("Payment Error:", err);
@@ -85,7 +98,7 @@ const CardDetails = () => {
         }`}
       >
         <h2 className="text-xl font-bold mb-4 text-center">
-          Enter Card Details ({selectedPayment})
+          Enter Card Details ({normalizedPaymentMethod})
         </h2>
         <input
           type="text"

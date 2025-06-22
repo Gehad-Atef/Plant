@@ -19,13 +19,18 @@ function PlantDiseaseDetector() {
   }, [user]);
 
   const handleImageChange = (e) => {
+    const file = e.target.files[0];
     if (!user) {
-      toast.error("Please Login First");
-    } else {
-      const file = e.target.files[0];
+      toast.error("Please login first.");
+      return;
+    }
+
+    if (file && file.type.startsWith("image/")) {
       setImage(file);
       setPreviewUrl(URL.createObjectURL(file));
       setResult(null);
+    } else {
+      toast.error("Please select a valid image file.");
     }
   };
 
@@ -33,12 +38,12 @@ function PlantDiseaseDetector() {
     if (!image || loading) return;
 
     const formData = new FormData();
-    formData.append("file", image);
+    formData.append("file", image); // ✅ اسم الحقل يجب أن يكون "file"
 
     try {
       setLoading(true);
       const response = await axios.post(
-        "https://greenland.runasp.net/plantdetection/detect",
+        "https://localhost:7286/plantdetection/detect",
         formData,
         {
           headers: {
@@ -47,10 +52,13 @@ function PlantDiseaseDetector() {
         }
       );
 
-      if (response.data.success) {
-        setResult(response.data.data); // ✅ نأخذ فقط الداتا
+      const data = response.data;
+
+      if (data.success) {
+        setResult(data.data);
+        toast.success("Plant detected successfully!");
       } else {
-        toast.error(response.data.message || "Detection failed");
+        toast.error(data.message || "Detection failed");
       }
     } catch (error) {
       console.error("Prediction failed:", error);
@@ -69,62 +77,60 @@ function PlantDiseaseDetector() {
       {!result ? (
         <div className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-8 w-full max-w-lg">
           <div className="relative w-full h-64 bg-gray-100 dark:bg-gray-700 rounded-xl overflow-hidden mb-4">
-            {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className="object-cover w-full h-full"
+            <label className="w-full h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-300 cursor-pointer">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
               />
-            ) : (
-              <label className="w-full h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-300 cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
+              {previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="object-cover w-full h-full"
                 />
-                {loading ? (
+              ) : loading ? (
+                <svg
+                  className="animate-spin h-16 w-16 text-green-500 mb-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+              ) : (
+                <>
                   <svg
-                    className="animate-spin h-16 w-16 text-green-500 mb-2"
-                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-16 h-16 mb-2"
                     fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
                     <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                    ></path>
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 16l4-4-4-4m0 8h18m-7-4l4 4-4 4"
+                    />
                   </svg>
-                ) : (
-                  <>
-                    <svg
-                      className="w-16 h-16 mb-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 16l4-4-4-4m0 8h18m-7-4l4 4-4 4"
-                      />
-                    </svg>
-                    <p>Upload Plant Photo</p>
-                  </>
-                )}
-              </label>
-            )}
+                  <p>Upload Plant Photo</p>
+                </>
+              )}
+            </label>
           </div>
 
           <button

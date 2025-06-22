@@ -7,12 +7,19 @@ export default function CreatePost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 🔒 تحقق زي الباك إند: لازم محتوى أو صورة
+    if (!content.trim() && !image) {
+      alert("يرجى كتابة محتوى أو اختيار صورة.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("content", content);
-    if (image) formData.append("Image", image);
+    if (image) formData.append("ImagePath", image); // ✅ اسم الحقل صح
 
     try {
-      await axios.post("https://localhost:7286//api/posts", formData);
+      await axios.post("https://localhost:7286/api/posts", formData);
       setContent("");
       setImage(null);
       window.location.reload();
@@ -32,7 +39,7 @@ export default function CreatePost() {
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={3}
-        required
+        // ❌ شيلنا required علشان نسمح بصورة بس
       />
 
       <div className="flex items-center justify-between">

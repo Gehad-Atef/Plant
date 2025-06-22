@@ -34,7 +34,7 @@ const AuthService = {
    */
   forgotPassword: async (email) => {
     try {
-      const clientUri = "https://greenland.runasp.net/changePass"; // Your client URI
+      const clientUri = "http://localhost:5173/changePass"; // Your client URI
       const response = await axiosClient.post("Auth/ForgetPassword", {
         email,
         clientUri,
