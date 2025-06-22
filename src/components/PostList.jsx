@@ -7,7 +7,7 @@ export default function PostList() {
 
   const fetchPosts = async () => {
     try {
-      const res = await axios.get("https://greenland.runasp.net/api/posts");
+      const res = await axios.get("https://localhost:7286/api/posts");
       setPosts(res.data.value || []);
     } catch (err) {
       console.error(err);

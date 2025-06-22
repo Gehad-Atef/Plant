@@ -12,7 +12,7 @@ export default function CreatePost() {
     if (image) formData.append("Image", image);
 
     try {
-      await axios.post("https://greenland.runasp.net/api/posts", formData);
+      await axios.post("https://localhost:7286//api/posts", formData);
       setContent("");
       setImage(null);
       window.location.reload();

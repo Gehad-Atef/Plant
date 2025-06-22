@@ -38,7 +38,7 @@ function PlantDiseaseDetector() {
     try {
       setLoading(true);
       const response = await axios.post(
-        "https://localhost:7286/api/plantdetection/detect",
+        "https://greenland.runasp.net/plantdetection/detect",
         formData,
         {
           headers: {
@@ -46,10 +46,15 @@ function PlantDiseaseDetector() {
           },
         }
       );
-      setResult(response.data);
+
+      if (response.data.success) {
+        setResult(response.data.data); // ✅ نأخذ فقط الداتا
+      } else {
+        toast.error(response.data.message || "Detection failed");
+      }
     } catch (error) {
       console.error("Prediction failed:", error);
-      alert("Prediction failed. Please try again.");
+      toast.error("Prediction failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -149,20 +154,37 @@ function PlantDiseaseDetector() {
               <span className="font-bold text-green-700 dark:text-green-300">
                 🌱 Name:
               </span>{" "}
-              {result.plantName}
+              {result.plantName || "Unknown"}
             </p>
+
+            {result.hasDisease ? (
+              <>
+                <p>
+                  <span className="font-bold text-red-600 dark:text-red-400">
+                    🦠 Disease:
+                  </span>{" "}
+                  {result.disease}
+                </p>
+                <p className="break-words">
+                  <span className="font-bold text-yellow-600 dark:text-yellow-400">
+                    💊 Treatment:
+                  </span>{" "}
+                  {result.solution}
+                </p>
+              </>
+            ) : (
+              <p className="text-green-600 dark:text-green-300 font-semibold">
+                ✅ This plant is healthy.
+              </p>
+            )}
+
             <p>
-              <span className="font-bold text-red-600 dark:text-red-400">
-                🦠 Disease:
+              <span className="font-bold text-blue-600 dark:text-blue-400">
+                📊 Accuracy:
               </span>{" "}
-              {result.disease}
+              {result.accuracy?.toFixed(2) || "N/A"}%
             </p>
-            <p className="break-words">
-              <span className="font-bold text-yellow-600 dark:text-yellow-400">
-                💊 Treatment:
-              </span>{" "}
-              {result.solution}
-            </p>
+
             <div className="pt-6 flex justify-center">
               <button
                 className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-300"

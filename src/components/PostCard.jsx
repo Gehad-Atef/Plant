@@ -8,6 +8,13 @@ import {
 } from "react-icons/fa";
 import axios from "../utils/axiosInstance";
 
+// ✅ دالة موحدة للتعامل مع روابط الصور
+const getImageUrl = (path) => {
+  if (!path) return "https://via.placeholder.com/100";
+  if (path.startsWith("http")) return path;
+  return `https://localhost:7286/${path}`;
+};
+
 export default function PostCard({ post, onPostDeleted }) {
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
@@ -96,7 +103,7 @@ export default function PostCard({ post, onPostDeleted }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <img
-            src={`https://greenland.runasp.net${post.imagePathUser}`}
+            src={getImageUrl(post.imagePathUser)}
             alt="User avatar"
             className="w-10 h-10 rounded-full object-cover"
           />
@@ -112,9 +119,9 @@ export default function PostCard({ post, onPostDeleted }) {
 
       {/* Content */}
       <p className="text-gray-800 dark:text-gray-100">{post.content}</p>
-      {post.imagePath && post.imagePath !== "https://greenland.runasp.net" && (
+      {post.imagePath && post.imagePath !== "https://localhost:7286/" && (
         <img
-          src={post.imagePath}
+          src={getImageUrl(post.imagePath)}
           alt="Post"
           className="w-full max-h-96 rounded-md object-cover"
         />
@@ -159,7 +166,7 @@ export default function PostCard({ post, onPostDeleted }) {
           {comments.map((c) => (
             <div key={c.id} className="flex items-start space-x-2">
               <img
-                src={`https://localhost:7286${c.imagePathUser}`}
+                src={getImageUrl(c.imagePathUser)}
                 alt="User"
                 className="w-8 h-8 rounded-full object-cover"
               />
