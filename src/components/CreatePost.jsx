@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "../utils/axiosInstance";
+import toast from "react-hot-toast";
 
 export default function CreatePost() {
   const [content, setContent] = useState("");
@@ -7,66 +8,84 @@ export default function CreatePost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // 🔒 تحقق زي الباك إند: لازم محتوى أو صورة
     if (!content.trim() && !image) {
-      alert("يرجى كتابة محتوى أو اختيار صورة.");
+      toast.error("Write something or choose an image.");
       return;
     }
 
     const formData = new FormData();
     formData.append("content", content);
-    if (image) formData.append("ImagePath", image); // ✅ اسم الحقل صح
+    if (image) formData.append("ImagePath", image);
 
     try {
-      await axios.post("https://localhost:7286/api/posts", formData);
+      await axios.post("https://localhost:7286/api/posts", formData, {
+        withCredentials: true,
+      });
+      toast.success("Post shared!");
       setContent("");
       setImage(null);
       window.location.reload();
     } catch (err) {
       console.error(err);
+      toast.error("Failed to create post.");
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow space-y-4"
-    >
-      <textarea
-        className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded p-3 resize-none text-sm text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-        placeholder="Share your experience..."
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        rows={3}
-        // ❌ شيلنا required علشان نسمح بصورة بس
-      />
-
-      <div className="flex items-center justify-between">
-        <label className="cursor-pointer text-sm text-gray-600 dark:text-gray-300 hover:text-green-600">
-          📷 Choose image
-          <input
-            type="file"
-            onChange={(e) => setImage(e.target.files[0])}
-            className="hidden"
+    <div className="flex justify-center mb-6">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-2xl bg-white dark:bg-gray-900 shadow rounded-xl p-4 border border-gray-200 dark:border-gray-700 space-y-4"
+      >
+        {/* Header */}
+        <div className="flex items-start gap-3">
+          <textarea
+            className="flex-1 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded p-3 resize-none text-sm text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="What's on your mind?"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={3}
           />
-        </label>
+        </div>
 
+        {/* Image Upload */}
+        <div className="flex justify-between items-center flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-300">
+          <label className="cursor-pointer hover:text-green-600">
+            📷 Upload image
+            <input
+              type="file"
+              onChange={(e) => setImage(e.target.files[0])}
+              accept="image/*"
+              className="hidden"
+            />
+          </label>
+
+          {image && (
+            <span className="text-xs truncate max-w-xs">{image.name}</span>
+          )}
+        </div>
+
+        {/* Preview */}
         {image && (
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            {image.name}
-          </span>
+          <div className="w-full">
+            <img
+              src={URL.createObjectURL(image)}
+              alt="Preview"
+              className="mt-2 max-h-[300px] w-full object-contain rounded border"
+            />
+          </div>
         )}
-      </div>
 
-      <div className="text-right">
-        <button
-          type="submit"
-          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded shadow text-sm transition duration-200"
-        >
-          Post
-        </button>
-      </div>
-    </form>
+        {/* Submit */}
+        <div className="text-right">
+          <button
+            type="submit"
+            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded shadow text-sm transition duration-200"
+          >
+            Share
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

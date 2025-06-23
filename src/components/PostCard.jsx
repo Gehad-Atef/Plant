@@ -7,20 +7,41 @@ import {
   FaPaperPlane,
 } from "react-icons/fa";
 import axios from "../utils/axiosInstance";
+import toast from "react-hot-toast";
+import { useProfile } from "@/hooks/authService";
 
-// ✅ دالة موحدة للتعامل مع روابط الصور
 const getImageUrl = (path) => {
   if (!path) return "https://via.placeholder.com/100";
   if (path.startsWith("http")) return path;
   return `https://localhost:7286/${path}`;
 };
 
+// Helper function to validate image URLs
+// const isValidImage = (url) => {
+//  if (!url || typeof url !== "string") return false;
+// const trimmed = url.trim().toLowerCase();
+//  if (trimmed === "" || trimmed === "null" || trimmed === "undefined")
+//   return false;
+// Optional: exclude known bad patterns
+// if (trimmed.includes(".svg") && trimmed.includes("placeholder")) return true; // allow placeholder SVGs
+// if (
+//   trimmed.endsWith("/") ||
+//   trimmed.endsWith(".undefined") ||
+////    trimmed.includes("/null")
+// )
+//   return false;
+// return true;
+//};
 export default function PostCard({ post, onPostDeleted }) {
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
   const [reacted, setReacted] = useState(false);
   const [likes, setLikes] = useState(post.reactCount || 0);
   const [newComment, setNewComment] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const { data: currentUser } = useProfile();
+  const isOwner = currentUser?.userName === post.userName;
 
   const fetchReactState = async () => {
     try {
@@ -28,7 +49,8 @@ export default function PostCard({ post, onPostDeleted }) {
         withCredentials: true,
       });
       const users = res.data?.value || [];
-      setReacted(users.some((u) => u.userName === post.userName));
+      setLikes(users.length);
+      setReacted(users.some((u) => u.userName === currentUser?.userName));
     } catch (err) {
       console.error("React state load error", err);
     }
@@ -36,19 +58,15 @@ export default function PostCard({ post, onPostDeleted }) {
 
   const toggleLike = async () => {
     try {
+      setReacted(true);
       await axios.post(
         `/api/React`,
         { postId: post.id, type: 1 },
         { withCredentials: true }
       );
-      const res = await axios.get(`/api/React/${post.id}`, {
-        withCredentials: true,
-      });
-      const users = res.data?.value || [];
-      setLikes(users.length);
-      setReacted(users.some((u) => u.userName === post.userName));
+      fetchReactState();
     } catch (err) {
-      console.error("React toggle failed", err);
+      toast.error("Failed to like post");
     }
   };
 
@@ -79,13 +97,15 @@ export default function PostCard({ post, onPostDeleted }) {
   };
 
   const deletePost = async () => {
+    if (!confirm("Are you sure you want to delete this post?")) return;
     try {
-      await axios.delete(`/api/posts/${post.id}`, {
-        withCredentials: true,
-      });
-      onPostDeleted?.();
+      setIsDeleting(true);
+      await axios.delete(`/api/posts/${post.id}`, { withCredentials: true });
+      toast.success("Post deleted");
+      setTimeout(() => onPostDeleted?.(), 300);
     } catch (err) {
-      console.error("Delete failed", err);
+      setIsDeleting(false);
+      toast.error("You’re not authorized to delete this post.");
     }
   };
 
@@ -98,88 +118,105 @@ export default function PostCard({ post, onPostDeleted }) {
   }, [showComments]);
 
   return (
-    <div className="bg-white dark:bg-gray-900 dark:text-white shadow rounded-xl p-4 space-y-2 border border-gray-200 dark:border-gray-700">
-      {/* Post header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <img
-            src={getImageUrl(post.imagePathUser)}
-            alt="User avatar"
-            className="w-10 h-10 rounded-full object-cover"
-          />
-          <span className="font-semibold">{post.userName}</span>
-        </div>
-        <button
-          onClick={deletePost}
-          className="text-red-500 hover:text-red-700"
-        >
-          <FaTrash />
-        </button>
-      </div>
-
-      {/* Content */}
-      <p className="text-gray-800 dark:text-gray-100">{post.content}</p>
-      {post.imagePath && post.imagePath !== "https://localhost:7286/" && (
-        <img
-          src={getImageUrl(post.imagePath)}
-          alt="Post"
-          className="w-full max-h-96 rounded-md object-cover"
-        />
-      )}
-
-      {/* Reactions */}
-      <div className="flex items-center justify-between pt-2 text-gray-600 dark:text-gray-400 text-sm">
-        <button
-          onClick={toggleLike}
-          className="flex items-center space-x-1 hover:text-red-500 dark:hover:text-red-400"
-        >
-          {reacted ? <FaHeart className="text-red-500" /> : <FaRegHeart />}
-          <span>{likes} Likes</span>
-        </button>
-        <button
-          onClick={() => setShowComments(!showComments)}
-          className="flex items-center space-x-1 hover:text-blue-600 dark:hover:text-blue-400"
-        >
-          <FaCommentAlt />
-          <span>{comments.length || post.commentCount || 0} Comments</span>
-        </button>
-      </div>
-
-      {/* Comments section */}
-      {showComments && (
-        <div className="pt-2 space-y-2 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex space-x-2">
-            <input
-              type="text"
-              placeholder="Write a comment..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              className="flex-1 px-3 py-2 border rounded-md text-sm dark:bg-gray-800 dark:text-white dark:border-gray-700"
+    <div className="flex justify-center">
+      <div
+        className={`w-full max-w-2xl bg-white dark:bg-gray-900 shadow rounded-xl p-4 border border-gray-200 dark:border-gray-700 space-y-4 transition-opacity duration-300 ${
+          isDeleting ? "opacity-0" : "opacity-100"
+        }`}
+      >
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <img
+              src={getImageUrl(post.imagePathUser)}
+              alt="Avatar"
+              className="w-10 h-10 rounded-full object-cover"
             />
-            <button
-              onClick={addComment}
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              <FaPaperPlane />
-            </button>
-          </div>
-          {comments.map((c) => (
-            <div key={c.id} className="flex items-start space-x-2">
-              <img
-                src={getImageUrl(c.imagePathUser)}
-                alt="User"
-                className="w-8 h-8 rounded-full object-cover"
-              />
-              <div className="flex-1 bg-gray-100 dark:bg-gray-800 p-2 rounded-md">
-                <p className="text-sm dark:text-white">
-                  <span className="font-semibold">{c.userName}</span>:{" "}
-                  {c.content}
-                </p>
-              </div>
+            <div>
+              <p className="font-semibold text-sm">{post.userName}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {post.time}
+              </p>
             </div>
-          ))}
+          </div>
+
+          {isOwner && (
+            <button
+              onClick={deletePost}
+              className="text-red-500 hover:text-red-700"
+              title="Delete Post"
+            >
+              <FaTrash />
+            </button>
+          )}
         </div>
-      )}
+
+        <p className="text-gray-800 dark:text-gray-100 text-sm">
+          {post.content}
+        </p>
+
+        {post.imagePath && (
+          <img
+            src={getImageUrl(post.imagePath)}
+            alt="Post"
+            className="w-full max-h-[500px] rounded-md object-contain border"
+          />
+        )}
+
+        <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 pt-2">
+          <button
+            onClick={toggleLike}
+            className={`flex items-center gap-1 hover:text-red-500 transition transform duration-200 ${
+              reacted ? "text-red-500 scale-110" : ""
+            }`}
+          >
+            {reacted ? <FaHeart /> : <FaRegHeart />}
+            <span>{likes} Likes</span>
+          </button>
+          <button
+            onClick={() => setShowComments(!showComments)}
+            className="flex items-center gap-1 hover:text-blue-600"
+          >
+            <FaCommentAlt />
+            <span>{comments.length || post.countComment} Comments</span>
+          </button>
+        </div>
+
+        {showComments && (
+          <div className="pt-2 border-t dark:border-gray-700 space-y-2">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Write a comment..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="flex-1 px-3 py-2 border rounded-md text-sm dark:bg-gray-800 dark:text-white dark:border-gray-700"
+              />
+              <button
+                onClick={addComment}
+                className="text-blue-600 hover:text-blue-800"
+              >
+                <FaPaperPlane />
+              </button>
+            </div>
+
+            {comments.map((c) => (
+              <div key={c.id} className="flex gap-2 items-start">
+                <img
+                  src={getImageUrl(c.imagePathUser)}
+                  alt="User"
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+                <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded-md w-full">
+                  <p className="text-sm text-gray-800 dark:text-white">
+                    <span className="font-semibold">{c.userName}</span>:{" "}
+                    {c.content}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
