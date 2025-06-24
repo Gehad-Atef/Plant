@@ -41,6 +41,7 @@ import OrdersPage from "./components/Admin/Pages/OrdersPage";
 // Modal
 import SinglePostModal from "./pages/SinglePostModal";
 import NotificationProvider from "./context/NotificationProvider";
+import NotificationPage from "./pages/Notification";
 
 function App() {
   const location = useLocation();
@@ -83,6 +84,7 @@ function App() {
           <Route path="/plant/:id" element={<PlantDetail />} />
           <Route path="/community" element={<Community />} />
           <Route path="/me-posts" element={<MyPosts />} />
+          <Route path="/notifications" element={<NotificationPage />} />
           <Route path="/detect" element={<PlantDiseaseDetector />} />
         </Route>
 

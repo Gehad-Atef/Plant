@@ -1,40 +1,47 @@
+// src/context/NotificationProvider.jsx
 import { createContext, useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import {
-  startNotificationHub,
-  stopNotificationHub,
-} from "../signalR/notificationHub";
-import useNotificationQuery from "@/hooks/useNotificationQuery";
+import { HubConnectionBuilder } from "@microsoft/signalr";
+import { useProfile } from "@/hooks/authService";
 
 export const NotificationContext = createContext();
 
 export default function NotificationProvider({ children }) {
-  const [realtimeNotifications, setRealtimeNotifications] = useState([]);
-  const { notifications: storedNotifications, refetch } =
-    useNotificationQuery();
+  const [notifications, setNotifications] = useState([]);
+  const { data: currentUser } = useProfile();
 
   useEffect(() => {
-    const handleNewNotification = (message) => {
-      setRealtimeNotifications((prev) => [...prev, message]);
-      toast(message);
+    if (!currentUser?.id) return;
 
-      // Optionally refetch stored notifications list
-      refetch();
+    const connection = new HubConnectionBuilder()
+      .withUrl("https://localhost:7286/hubs/notification", {
+        withCredentials: true,
+      })
+      .withAutomaticReconnect()
+      .build();
+
+    connection
+      .start()
+      .then(() => console.log("✅ SignalR Connected"))
+      .catch((err) => console.error("❌ SignalR Error:", err));
+
+    connection.on("ReceiveNotification", (message) => {
+      const newNotification =
+        typeof message === "string" ? { message } : message;
+
+      // ✅ Don't push notification if it's from yourself
+      const sender = newNotification.commenterName || newNotification.userName;
+      if (sender === currentUser?.userName) return;
+
+      setNotifications((prev) => [newNotification, ...prev]);
+    });
+
+    return () => {
+      connection.stop();
     };
-
-    startNotificationHub(handleNewNotification);
-    return () => stopNotificationHub();
-  }, [refetch]);
+  }, [currentUser]);
 
   return (
-    <NotificationContext.Provider
-      value={{
-        notifications: [
-          ...(storedNotifications || []),
-          ...realtimeNotifications,
-        ],
-      }}
-    >
+    <NotificationContext.Provider value={{ notifications, setNotifications }}>
       {children}
     </NotificationContext.Provider>
   );

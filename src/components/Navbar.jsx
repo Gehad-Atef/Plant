@@ -1,7 +1,5 @@
-// Enhanced Navbar.tsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import useNotificationQuery from "../hooks/useNotificationQuery";
 import {
   motion,
   AnimatePresence,
@@ -20,18 +18,17 @@ import {
   Bell,
   LogOut,
 } from "lucide-react";
+import useNotificationQuery from "../hooks/useNotificationQuery";
+import { useTheme } from "../context/ThemeProvider";
+import { useUserContext } from "../context/UserProvider";
+import { SearchContext } from "@/context/SearchProvider";
+import { useCart } from "../context/CartProvider";
+import PlantAIIcon from "../assets/Icons/plant-svgrepo-com.svg?react";
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-
-import { useTheme } from "../context/ThemeProvider";
-import { useUserContext } from "../context/UserProvider";
-import { useContext } from "react";
-import { SearchContext } from "@/context/SearchProvider";
-import { useCart } from "../context/CartProvider";
-import PlantAIIcon from "../assets/Icons/plant-svgrepo-com.svg?react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,9 +46,8 @@ const navRoutes = [
   { path: "/product", name: "Product" },
 ];
 
-const Navbar = () => {
+export default function Navbar() {
   const { darkMode, toggleDarkMode } = useTheme();
-  // const { isAuthenticated, logout } = useUserContext();
   const { user, isAuthenticated, logout } = useUserContext();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -61,10 +57,21 @@ const Navbar = () => {
   const { setShowSearch } = useContext(SearchContext);
   const { cartItems, clearCartItems } = useCart();
   const cartQuantity = cartItems?.length || 0;
-  //const { data: user } = useProfile();
 
-  const { notifications, isLoading, isError } = useNotificationQuery();
-  const notificationCount = notifications?.length || 0;
+  const {
+    notifications: rawNotifications,
+    isLoading,
+    isError,
+  } = useNotificationQuery();
+
+  const notifications =
+    rawNotifications?.filter((notif) => {
+      const sender = notif.commenterName || notif.userName;
+      return sender !== user?.userName;
+    }) || [];
+
+  const notificationCount = notifications.length;
+
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 50);
   });
@@ -72,11 +79,13 @@ const Navbar = () => {
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
+
   const handleLogout = () => {
     logout();
     clearCartItems();
     navigate("/");
   };
+
   return (
     <motion.nav
       initial={{ opacity: 0, y: -20 }}
@@ -98,12 +107,10 @@ const Navbar = () => {
             <Link
               to="/"
               className="text-2xl font-bold text-green-600 dark:text-green-400 flex items-center gap-2"
-              aria-label="Plant Store Home"
             >
               <motion.span
                 animate={{ rotate: [0, 20, -20, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
-                aria-hidden="true"
               >
                 🌿
               </motion.span>
@@ -111,7 +118,7 @@ const Navbar = () => {
             </Link>
           </motion.div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
             <div className="flex space-x-6">
               {navRoutes.map((route) => (
@@ -135,14 +142,13 @@ const Navbar = () => {
               ))}
             </div>
 
-            {/* Action Icons */}
+            {/* Actions */}
             <div className="flex items-center gap-4 ml-4">
               <IconButton
                 icon={<Search className="w-5 h-5" />}
                 onClick={() => setShowSearch(true)}
                 label="Open search"
               />
-
               <IconButton
                 icon={<PlantAIIcon className="w-6 h-6" />}
                 onClick={() => navigate("/detect")}
@@ -151,10 +157,7 @@ const Navbar = () => {
               {isAuthenticated && (
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button
-                      className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400"
-                      aria-label="Notifications"
-                    >
+                    <button className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400">
                       <Bell className="w-5 h-5" />
                       {notificationCount > 0 && (
                         <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
@@ -163,65 +166,55 @@ const Navbar = () => {
                       )}
                     </button>
                   </PopoverTrigger>
-
                   <PopoverContent className="w-80 p-0 overflow-hidden shadow-lg">
                     <div className="bg-white dark:bg-gray-800 rounded-lg">
-                      {/* Header */}
                       <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                         <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100">
                           Notifications
                         </h3>
-                        <button className="text-xs text-green-600 hover:underline dark:text-green-400">
-                          Mark all as read
-                        </button>
                       </div>
-
-                      {/* Body */}
                       <div className="max-h-64 overflow-y-auto custom-scrollbar">
                         {isLoading && (
                           <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                             Loading...
                           </div>
                         )}
-
                         {isError && (
                           <div className="px-4 py-3 text-sm text-red-500">
                             Failed to load notifications.
                           </div>
                         )}
-
-                        {!isLoading && notifications?.length === 0 && (
+                        {!isLoading && notifications.length === 0 && (
                           <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                             No notifications yet.
                           </div>
                         )}
-
                         <ul className="divide-y divide-gray-200 dark:divide-gray-700 max-h-64 overflow-y-auto">
                           <AnimatePresence>
-                            {notifications?.map((notif, index) => (
+                            {notifications.map((notif, index) => (
                               <motion.li
                                 key={notif.message + notif.createdAt + index}
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.25 }}
-                                className={`flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition group`}
+                                className="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition group"
                                 onClick={() =>
                                   navigate(`/post/${notif.postId}`)
                                 }
                               >
                                 <img
                                   src={notif.imageUrl}
-                                  alt={notif.commenterName}
+                                  alt="Avatar"
                                   className="w-8 h-8 rounded-full object-cover border border-green-500"
                                   onError={(e) => {
-                                    e.target.src = "/default-avatar.png"; // fallback
+                                    e.target.src = "/default-avatar.png";
                                   }}
                                 />
                                 <div className="flex-1">
                                   <p className="text-sm text-gray-800 dark:text-gray-100 leading-snug">
                                     <span className="font-medium text-green-600 dark:text-green-400">
-                                      {notif.commenterName}
+                                      {notif.commenterName || notif.userName}
                                     </span>{" "}
                                     {notif.message}
                                   </p>
@@ -229,18 +222,16 @@ const Navbar = () => {
                                     {new Date(notif.createdAt).toLocaleString()}
                                   </p>
                                 </div>
-                                {!notif.isRead && (
-                                  <span className="w-2 h-2 mt-1 rounded-full bg-green-500 group-hover:scale-125 transition" />
-                                )}
                               </motion.li>
                             ))}
                           </AnimatePresence>
                         </ul>
                       </div>
-
-                      {/* Footer */}
                       <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700 text-center">
-                        <button className="text-xs text-green-600 hover:underline dark:text-green-400">
+                        <button
+                          onClick={() => navigate("/notifications")}
+                          className="text-xs text-green-600 hover:underline dark:text-green-400"
+                        >
                           View all notifications
                         </button>
                       </div>
@@ -248,14 +239,11 @@ const Navbar = () => {
                   </PopoverContent>
                 </Popover>
               )}
-
               <CartButton
                 quantity={cartQuantity}
                 onClick={() => navigate("/cart")}
               />
-
               <ThemeToggle darkMode={darkMode} toggle={toggleDarkMode} />
-
               <UserSection
                 isAuthenticated={isAuthenticated}
                 user={user}
@@ -265,11 +253,10 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile menu toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-            aria-label="Toggle navigation menu"
           >
             {isOpen ? (
               <X className="w-6 h-6 text-red-500" />
@@ -279,75 +266,11 @@ const Navbar = () => {
           </button>
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-40"
-              onClick={() => setIsOpen(false)}
-            />
-
-            <motion.div
-              initial={{ y: -100, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -100, opacity: 0 }}
-              transition={{
-                type: "spring",
-                stiffness: 300,
-                damping: 30,
-              }}
-              className="md:hidden fixed top-20 inset-x-4 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-50"
-            >
-              <div className="p-4">
-                {navRoutes.map((route) => (
-                  <Link
-                    key={route.path}
-                    to={route.path}
-                    className={`block py-3 px-4 rounded-lg ${
-                      location.pathname === route.path
-                        ? "bg-green-100 dark:bg-gray-700 text-green-600 dark:text-green-400"
-                        : "hover:bg-gray-100 dark:hover:bg-gray-700"
-                    }`}
-                  >
-                    {route.name}
-                  </Link>
-                ))}
-
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center justify-around">
-                    <IconButton
-                      icon={<Search className="w-5 h-5" />}
-                      onClick={() => setShowSearch(true)}
-                      label="Search"
-                    />
-                    <IconButton
-                      icon={<PlantAIIcon className="w-6 h-6" />}
-                      onClick={() => navigate("/detect")}
-                      label="AI Detection"
-                    />
-                    <CartButton
-                      quantity={cartQuantity}
-                      onClick={() => navigate("/cart")}
-                    />
-                    <ThemeToggle darkMode={darkMode} toggle={toggleDarkMode} />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </motion.nav>
   );
-};
+}
 
-// Sub-components for better organization
-
+// Sub-components
 const IconButton = ({ icon, onClick, label }) => (
   <motion.button
     whileHover={{ scale: 1.05 }}
@@ -362,11 +285,7 @@ const IconButton = ({ icon, onClick, label }) => (
 
 const CartButton = ({ quantity, onClick }) => (
   <motion.div whileHover={{ scale: 1.05 }} className="relative">
-    <motion.button
-      className="p-2 relative"
-      onClick={onClick}
-      aria-label="View shopping cart"
-    >
+    <motion.button className="p-2 relative" onClick={onClick}>
       <ShoppingCart className="w-5 h-5" />
       {quantity > 0 && (
         <motion.span
@@ -388,7 +307,7 @@ const ThemeToggle = ({ darkMode, toggle }) => (
     className="p-2 rounded-full bg-gray-200 dark:bg-gray-700"
     whileHover={{ scale: 1.1 }}
     whileTap={{ scale: 0.9 }}
-    aria-label={`Toggle ${darkMode ? "light" : "dark"} mode`}
+    aria-label="Toggle theme"
   >
     <motion.div
       animate={{ rotate: darkMode ? 180 : 0 }}
@@ -411,23 +330,18 @@ const UserSection = ({ isAuthenticated, user, onLogout, navigate }) => {
               <AvatarImage
                 src={user?.imagePath}
                 className="object-cover"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                }}
+                onError={(e) => (e.target.style.display = "none")}
               />
               <AvatarFallback className="bg-gray-100 dark:bg-gray-700">
                 {user?.userName?.[0] || <User className="w-4 h-4" />}
               </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-
           <DropdownMenuContent align="end" className="w-48">
             <div className="px-2 py-1.5 text-sm font-medium truncate">
               {user?.userName || "User Account"}
             </div>
-
             <DropdownMenuSeparator />
-
             <DropdownMenuItem
               onClick={() => navigate(isAdmin ? "/dashboard" : "/profile")}
               className="cursor-pointer"
@@ -435,7 +349,6 @@ const UserSection = ({ isAuthenticated, user, onLogout, navigate }) => {
               <Settings2 className="w-4 h-4 mr-2" />
               {isAdmin ? "Dashboard" : "Profile"}
             </DropdownMenuItem>
-
             <DropdownMenuItem
               onClick={onLogout}
               className="text-red-600 cursor-pointer dark:text-red-400"
@@ -450,7 +363,6 @@ const UserSection = ({ isAuthenticated, user, onLogout, navigate }) => {
           <Link
             to="/login"
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            aria-label="Login or Register"
           >
             Login
           </Link>
@@ -459,5 +371,3 @@ const UserSection = ({ isAuthenticated, user, onLogout, navigate }) => {
     </div>
   );
 };
-
-export default Navbar;
