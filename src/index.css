@@ -136,3 +136,24 @@
 .dark * {
     scrollbar-color: rgba(16, 185, 129, 0.8) rgba(31, 41, 55, 0.3);
 }
+@keyframes like-bounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3); }
+  60% { transform: scale(0.9); }
+  80% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+.animate-like-bounce {
+  animation: like-bounce 0.4s ease-out;
+}
+/* global.css */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.4);
+  border-radius: 10px;
+}

@@ -1,3 +1,4 @@
+// src/components/PostList.jsx
 import { useEffect, useState } from "react";
 import axios from "../utils/axiosInstance";
 import PostCard from "./PostCard";
