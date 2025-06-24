@@ -4,6 +4,7 @@ import PostCard from "../components/PostCard";
 import CreatePost from "../components/CreatePost";
 import Sidebar from "../components/Sidebar";
 import { useNavigate } from "react-router-dom";
+import PostSkeleton from "../components/PostSkeleton";
 
 const getImageUrl = (path) => {
   if (!path) return "https://via.placeholder.com/100";
@@ -14,24 +15,23 @@ const getImageUrl = (path) => {
 export default function MyPosts() {
   const [posts, setPosts] = useState([]);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const fetchMyPosts = async () => {
     try {
-      const res = await axios.get("https://localhost:7286/me/Posts", {
-        withCredentials: true,
-      });
+      const res = await axios.get("https://localhost:7286/me/Posts");
       setPosts(res.data || []);
     } catch (err) {
       console.error("Error fetching posts", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchProfile = async () => {
     try {
-      const res = await axios.get("https://localhost:7286/me", {
-        withCredentials: true,
-      });
+      const res = await axios.get("https://localhost:7286/me");
       setUser(res.data || null);
     } catch (err) {
       console.error("Failed to load profile info", err);
@@ -54,7 +54,6 @@ export default function MyPosts() {
     <div className="flex">
       <Sidebar />
       <div className="ml-64 w-full p-4 bg-green-50 dark:bg-gray-800 min-h-screen space-y-6">
-        {/* Profile Header */}
         {user && (
           <div className="bg-white dark:bg-gray-900 shadow rounded-xl p-5 border border-gray-300 dark:border-gray-700 flex flex-col sm:flex-row items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -72,7 +71,6 @@ export default function MyPosts() {
                 </p>
               </div>
             </div>
-
             <button
               onClick={() => navigate("/profile")}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow text-sm"
@@ -82,25 +80,23 @@ export default function MyPosts() {
           </div>
         )}
 
-        {/* Create Post */}
         <CreatePost onPostCreated={fetchMyPosts} />
 
-        {/* Posts Section */}
-        <div className="space-y-4">
-          {posts.length === 0 ? (
-            <div className="text-center text-gray-600 dark:text-gray-300 text-sm py-10">
-              You haven’t posted anything yet.
-            </div>
-          ) : (
-            posts.map((post) => (
-              <PostCard
-                key={post.id}
-                post={post}
-                onPostDeleted={fetchMyPosts}
-              />
-            ))
-          )}
-        </div>
+        {loading ? (
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <PostSkeleton key={idx} />
+            ))}
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="text-center text-gray-600 dark:text-gray-300 text-sm py-10">
+            You haven’t posted anything yet.
+          </div>
+        ) : (
+          posts.map((post) => (
+            <PostCard key={post.id} post={post} onPostDeleted={fetchMyPosts} />
+          ))
+        )}
       </div>
     </div>
   );

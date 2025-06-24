@@ -1,10 +1,18 @@
-import { useState } from "react";
+// src/components/CreatePost.jsx
+import { useState, useRef, useEffect } from "react";
 import axios from "../utils/axiosInstance";
 import toast from "react-hot-toast";
 
-export default function CreatePost() {
+export default function CreatePost({ onPostCreated }) {
   const [content, setContent] = useState("");
   const [image, setImage] = useState(null);
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,10 +29,10 @@ export default function CreatePost() {
       await axios.post("https://localhost:7286/api/posts", formData, {
         withCredentials: true,
       });
-      toast.success("Post shared!");
+
       setContent("");
       setImage(null);
-      window.location.reload();
+      onPostCreated?.(); // ✅ call parent to reload posts safely
     } catch (err) {
       console.error(err);
       toast.error("Failed to create post.");
@@ -37,9 +45,10 @@ export default function CreatePost() {
         onSubmit={handleSubmit}
         className="w-full max-w-2xl bg-white dark:bg-gray-900 shadow rounded-xl p-4 border border-gray-200 dark:border-gray-700 space-y-4"
       >
-        {/* Header */}
+        {/* Textarea */}
         <div className="flex items-start gap-3">
           <textarea
+            ref={textareaRef}
             className="flex-1 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded p-3 resize-none text-sm text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="What's on your mind?"
             value={content}
@@ -65,7 +74,7 @@ export default function CreatePost() {
           )}
         </div>
 
-        {/* Preview */}
+        {/* Image Preview */}
         {image && (
           <div className="w-full">
             <img
