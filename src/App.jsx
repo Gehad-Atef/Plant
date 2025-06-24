@@ -110,6 +110,10 @@ function App() {
                     <Route path="/dashboard" element={<AdminLayout />}>
                         <Route index element={<DashboardPage />} />
                         <Route
+                            path="/dashboard/categories"
+                            element={<CategoriesPage />}
+                        />
+                        <Route
                             path="/dashboard/products"
                             element={<ProductsPage />}
                         />
