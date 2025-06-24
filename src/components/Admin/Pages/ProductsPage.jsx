@@ -4,149 +4,511 @@ import { useTheme } from "../../../context/ThemeProvider";
 import toast from "react-hot-toast";
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState([]);
-  const [selectedProducts, setSelectedProducts] = useState([]);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [hasNextPage, setHasNextPage] = useState(false);
-  const [hasPrevPage, setHasPrevPage] = useState(false);
-  const { darkMode } = useTheme();
+    const [products, setProducts] = useState([]);
+    const [selectedProducts, setSelectedProducts] = useState([]);
+    const [pageNumber, setPageNumber] = useState(1);
+    const [hasNextPage, setHasNextPage] = useState(false);
+    const [hasPrevPage, setHasPrevPage] = useState(false);
+    const [showAddPopup, setShowAddPopup] = useState(false);
+    const [newProduct, setNewProduct] = useState({
+        name: "",
+        price: "",
+        description: "",
+        how_To_Plant: "",
+        quantity: "",
+        categoryId: "",
+        imageFile: null,
+    });
+    const [categories, setCategories] = useState([]);
+    const [editingProduct, setEditingProduct] = useState(null);
+    const { darkMode } = useTheme();
 
-  const fetchProducts = (page = 1) => {
-    axios
-      .get(
-        `https://greenland.runasp.net/api/Plant?PageNumber=${page}&PageSize=13`
-      )
-      .then((res) => {
-        const data = res.data.value;
-        setProducts(data.items);
-        setHasNextPage(data.hasNextPage);
-        setHasPrevPage(data.hasPreviousPage);
-        setPageNumber(page);
-      })
-      .catch((err) => console.error(err));
-  };
+    const fetchProducts = (page = 1) => {
+        axios
+            .get(
+                `https://greenland.runasp.net/api/Plant?PageNumber=${page}&PageSize=13`
+            )
+            .then((res) => {
+                const data = res.data.value;
+                setProducts(data.items);
+                setHasNextPage(data.hasNextPage);
+                setHasPrevPage(data.hasPreviousPage);
+                setPageNumber(page);
+            })
+            .catch((err) => console.error(err));
+    };
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+    const fetchCategories = () => {
+        axios
+            .get("https://greenland.runasp.net/Category")
+            .then((res) => setCategories(res.data.value.items || []))
+            .catch((err) => console.error("Failed to fetch categories", err));
+    };
 
-  const handleCheckboxChange = (productId) => {
-    setSelectedProducts((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId]
-    );
-  };
+    useEffect(() => {
+        fetchProducts();
+        fetchCategories();
+    }, []);
 
-  const handleDeleteSelected = () => {
-    const token = localStorage.getItem("authToken");
+    const handleCheckboxChange = (productId) => {
+        setSelectedProducts((prev) =>
+            prev.includes(productId)
+                ? prev.filter((id) => id !== productId)
+                : [...prev, productId]
+        );
+    };
 
-    if (!token) {
-      console.error("No auth token found.");
-      return;
-    }
+    const handleDeleteSelected = () => {
+        const token = localStorage.getItem("authToken");
+        if (!token) return;
 
-    Promise.all(
-      selectedProducts.map((id) =>
-        axios.delete(`https://localhost:7286/api/Plant/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-      )
-    )
-      .then(() => {
-        toast.success("Deleted successfully");
-        setSelectedProducts([]);
-        fetchProducts(pageNumber); // reload same page
-      })
-      .catch((err) => {
-        console.error("Deletion error:", err);
-        toast.error("Failed to delete some items");
-      });
-  };
+        Promise.all(
+            selectedProducts.map((id) =>
+                axios.delete(`https://greenland.runasp.net/api/Plant/${id}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                })
+            )
+        )
+            .then(() => {
+                toast.success("Deleted successfully");
+                setSelectedProducts([]);
+                fetchProducts(pageNumber);
+            })
+            .catch((err) => {
+                console.error("Deletion error:", err);
+                toast.error("Failed to delete some items");
+            });
+    };
 
-  const loadNextPage = () => {
-    if (hasNextPage) fetchProducts(pageNumber + 1);
-  };
+    const handleEditSelected = () => {
+        const selected = products.find((p) => p.id === selectedProducts[0]);
+        if (selected) setEditingProduct(selected);
+    };
 
-  const loadPrevPage = () => {
-    if (hasPrevPage) fetchProducts(pageNumber - 1);
-  };
+    const handleEditProduct = async () => {
+        const token = localStorage.getItem("authToken");
+        if (!token || !editingProduct) return;
 
-  return (
-    <div
-      className={`p-6 rounded-lg shadow transition-colors duration-300 ${
-        darkMode ? "bg-gray-900 text-gray-100" : "bg-white text-gray-900"
-      }`}
-    >
-      <div className="flex justify-between mb-4 items-center">
-        <h2 className="text-xl font-semibold">All Products</h2>
-        <div className="space-x-2">
-          {/* <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition">
-            Add
-          </button> */}
-          <button
-            onClick={handleDeleteSelected}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition disabled:opacity-50"
-            disabled={selectedProducts.length === 0}
-          >
-            Delete Selected
-          </button>
+        const formData = new FormData();
+        formData.append("id", editingProduct.id);
+        formData.append("name", editingProduct.name);
+        formData.append("price", parseFloat(editingProduct.price));
+        formData.append("description", editingProduct.description);
+        formData.append("how_To_Plant", editingProduct.how_To_Plant);
+        formData.append("quantity", parseInt(editingProduct.quantity));
+
+        const categoryIdToSend =
+            editingProduct.categoryId && editingProduct.categoryId !== ""
+                ? parseInt(editingProduct.categoryId)
+                : products.find((p) => p.id === editingProduct.id)?.categoryId;
+
+        if (categoryIdToSend) {
+            formData.append("categoryId", categoryIdToSend);
+        }
+
+        formData.append("is_Available", true);
+        if (editingProduct.imageFile) {
+            formData.append("imageFile", editingProduct.imageFile);
+        }
+
+        try {
+            await axios.put(
+                `https://greenland.runasp.net/api/Plant/${editingProduct.id}`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+            toast.success("Product updated successfully");
+            setEditingProduct(null);
+            fetchProducts();
+        } catch (err) {
+            console.error("Edit error:", err);
+            toast.error("Failed to update product");
+        }
+    };
+
+    const handleAddProduct = async () => {
+        const token = localStorage.getItem("authToken");
+        if (!token) return;
+
+        const formData = new FormData();
+        formData.append("name", newProduct.name);
+        formData.append("price", parseFloat(newProduct.price));
+        formData.append("description", newProduct.description);
+        formData.append("how_To_Plant", newProduct.how_To_Plant);
+        formData.append("quantity", parseInt(newProduct.quantity));
+        formData.append("categoryId", newProduct.categoryId);
+        formData.append("is_Available", true);
+        if (newProduct.imageFile) {
+            formData.append("imageFile", newProduct.imageFile);
+        }
+
+        try {
+            await axios.post(
+                "https://greenland.runasp.net/api/Plant",
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+            toast.success("Product added successfully");
+            setShowAddPopup(false);
+            setNewProduct({
+                name: "",
+                price: "",
+                description: "",
+                how_To_Plant: "",
+                quantity: "",
+                categoryId: "",
+                imageFile: null,
+            });
+            fetchProducts();
+        } catch (err) {
+            console.error("Add error:", err);
+            toast.error("Failed to add product");
+        }
+    };
+
+    const loadNextPage = () => hasNextPage && fetchProducts(pageNumber + 1);
+    const loadPrevPage = () => hasPrevPage && fetchProducts(pageNumber - 1);
+
+    return (
+        <div
+            className={`p-6 rounded-lg shadow ${
+                darkMode ? "bg-gray-900 text-white" : "bg-white text-black"
+            }`}
+        >
+            <div className="flex justify-between mb-4">
+                <h2 className="text-xl font-semibold">All Products</h2>
+                <div className="flex flex-col sm:flex-row gap-2">
+                    <button
+                        className="bg-green-500 text-white px-4 py-2 rounded"
+                        onClick={() => setShowAddPopup(true)}
+                    >
+                        Add Product
+                    </button>
+                    {selectedProducts.length === 1 && (
+                        <button
+                            className="bg-yellow-500 text-white px-4 py-2 rounded"
+                            onClick={handleEditSelected}
+                        >
+                            Edit Selected
+                        </button>
+                    )}
+                    {selectedProducts.length > 0 && (
+                        <button
+                            className="bg-red-500 text-white px-4 py-2 rounded"
+                            onClick={handleDeleteSelected}
+                        >
+                            Delete Selected
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {/* Add Product Popup */}
+            {showAddPopup && (
+                <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-[90%] md:w-[600px] space-y-4">
+                        <h3 className="text-xl font-bold mb-4">Add Product</h3>
+                        <div className="grid grid-cols-1 gap-4">
+                            <input
+                                type="text"
+                                placeholder="Name"
+                                className="border rounded px-4 py-2"
+                                value={newProduct.name}
+                                onChange={(e) =>
+                                    setNewProduct({
+                                        ...newProduct,
+                                        name: e.target.value,
+                                    })
+                                }
+                            />
+                            <input
+                                type="number"
+                                placeholder="Price"
+                                className="border rounded px-4 py-2"
+                                value={newProduct.price}
+                                onChange={(e) =>
+                                    setNewProduct({
+                                        ...newProduct,
+                                        price: e.target.value,
+                                    })
+                                }
+                            />
+                            <textarea
+                                placeholder="Description"
+                                className="border rounded px-4 py-4 p-0"
+                                value={newProduct.description}
+                                onChange={(e) =>
+                                    setNewProduct({
+                                        ...newProduct,
+                                        description: e.target.value,
+                                    })
+                                }
+                            />
+                            <textarea
+                                placeholder="How To Plant"
+                                className="border rounded px-4 py-4"
+                                value={newProduct.how_To_Plant}
+                                onChange={(e) =>
+                                    setNewProduct({
+                                        ...newProduct,
+                                        how_To_Plant: e.target.value,
+                                    })
+                                }
+                            />
+                            <input
+                                type="number"
+                                placeholder="Quantity"
+                                className="border rounded px-4 py-2"
+                                value={newProduct.quantity}
+                                onChange={(e) =>
+                                    setNewProduct({
+                                        ...newProduct,
+                                        quantity: e.target.value,
+                                    })
+                                }
+                            />
+                            <select
+                                className="border rounded px-4 py-2"
+                                value={newProduct.categoryId}
+                                onChange={(e) =>
+                                    setNewProduct({
+                                        ...newProduct,
+                                        categoryId: e.target.value,
+                                    })
+                                }
+                            >
+                                <option value="">Select Category</option>
+                                {categories.map((cat) => (
+                                    <option key={cat.id} value={cat.id}>
+                                        {cat.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <input
+                                type="file"
+                                className="border rounded px-4 py-2"
+                                onChange={(e) =>
+                                    setNewProduct({
+                                        ...newProduct,
+                                        imageFile: e.target.files[0],
+                                    })
+                                }
+                            />
+                        </div>
+                        <div className="flex justify-end gap-4 mt-4">
+                            <button
+                                onClick={() => {
+                                    setShowAddPopup(false);
+                                    setNewProduct({
+                                        name: "",
+                                        price: "",
+                                        description: "",
+                                        how_To_Plant: "",
+                                        quantity: "",
+                                        categoryId: "",
+                                        imageFile: null,
+                                    });
+                                }}
+                                className="bg-gray-300 px-4 py-2 rounded"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleAddProduct}
+                                className="bg-green-500 text-white px-4 py-2 rounded"
+                            >
+                                Add Product
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {editingProduct && (
+                <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-[90%] md:w-[600px] space-y-4">
+                        <h3 className="text-xl font-bold mb-4">Edit Product</h3>
+                        <div className="grid grid-cols-1 gap-4">
+                            <input
+                                type="text"
+                                placeholder="Name"
+                                className="border rounded px-4 py-2"
+                                value={editingProduct.name}
+                                onChange={(e) =>
+                                    setEditingProduct({
+                                        ...editingProduct,
+                                        name: e.target.value,
+                                    })
+                                }
+                            />
+                            <input
+                                type="number"
+                                placeholder="Price"
+                                className="border rounded px-4 py-2"
+                                value={editingProduct.price}
+                                onChange={(e) =>
+                                    setEditingProduct({
+                                        ...editingProduct,
+                                        price: e.target.value,
+                                    })
+                                }
+                            />
+                            <textarea
+                                placeholder="Description"
+                                className="border rounded px-4 py-8"
+                                value={editingProduct.description}
+                                onChange={(e) =>
+                                    setEditingProduct({
+                                        ...editingProduct,
+                                        description: e.target.value,
+                                    })
+                                }
+                            />
+                            <textarea
+                                placeholder="How To Plant"
+                                className="border rounded px-4 py-8"
+                                value={editingProduct.how_To_Plant}
+                                onChange={(e) =>
+                                    setEditingProduct({
+                                        ...editingProduct,
+                                        how_To_Plant: e.target.value,
+                                    })
+                                }
+                            />
+                            <input
+                                type="number"
+                                placeholder="Quantity"
+                                className="border rounded px-4 py-2"
+                                value={editingProduct.quantity}
+                                onChange={(e) =>
+                                    setEditingProduct({
+                                        ...editingProduct,
+                                        quantity: e.target.value,
+                                    })
+                                }
+                            />
+                            <select
+                                className="border rounded px-4 py-2"
+                                value={
+                                    editingProduct.categoryId
+                                        ? editingProduct.categoryId.toString()
+                                        : ""
+                                }
+                                onChange={(e) =>
+                                    setEditingProduct({
+                                        ...editingProduct,
+                                        categoryId: e.target.value,
+                                    })
+                                }
+                            >
+                                <option
+                                    value={
+                                        editingProduct.categoryId
+                                            ? editingProduct.categoryId.toString()
+                                            : ""
+                                    }
+                                >
+                                    {categories.find(
+                                        (cat) =>
+                                            cat.id.toString() ===
+                                            editingProduct.categoryId?.toString()
+                                    )?.name || "Select Category"}
+                                </option>
+                                {categories
+                                    .filter(
+                                        (cat) =>
+                                            cat.id.toString() !==
+                                            editingProduct.categoryId?.toString()
+                                    )
+                                    .map((cat) => (
+                                        <option
+                                            key={cat.id}
+                                            value={cat.id.toString()}
+                                        >
+                                            {cat.name}
+                                        </option>
+                                    ))}
+                            </select>
+                        </div>
+                        <div className="flex justify-end gap-4 mt-4">
+                            <button
+                                onClick={() => setEditingProduct(null)}
+                                className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleEditProduct}
+                                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                            >
+                                Done
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <table className="w-full table-auto">
+                <thead>
+                    <tr className="text-left border-b dark:border-gray-700">
+                        <th className="py-2"></th>
+                        <th className="py-2">Name</th>
+                        <th className="py-2">Category</th>
+                        <th className="py-2">Price</th>
+                        <th className="py-2">Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {products.map((prod) => (
+                        <tr
+                            key={prod.id}
+                            className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                        >
+                            <td className="py-2">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedProducts.includes(prod.id)}
+                                    onChange={() =>
+                                        handleCheckboxChange(prod.id)
+                                    }
+                                />
+                            </td>
+                            <td className="py-2">{prod.name}</td>
+                            <td className="py-2">{prod.categoryName}</td>
+                            <td className="py-2">${prod.price}</td>
+                            <td className="py-2">{prod.quantity}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+
+            <div className="flex justify-center mt-6 space-x-4">
+                {hasPrevPage && (
+                    <button
+                        className="flex items-center gap-2 text-green-600 font-semibold hover:text-green-800 transition duration-300"
+                        onClick={loadPrevPage}
+                    >
+                        &larr; Prev Page
+                    </button>
+                )}
+                {hasNextPage && (
+                    <button
+                        className="flex items-center gap-2 text-green-600 font-semibold hover:text-green-800 transition duration-300"
+                        onClick={loadNextPage}
+                    >
+                        Next Page &rarr;
+                    </button>
+                )}
+            </div>
         </div>
-      </div>
-
-      <table className="w-full table-auto">
-        <thead>
-          <tr className="text-left border-b dark:border-gray-700">
-            <th className="py-2"></th>
-            <th className="py-2">Name</th>
-            <th className="py-2">Category</th>
-            <th className="py-2">Price</th>
-            <th className="py-2">Quantity</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((prod) => (
-            <tr
-              key={prod.id}
-              className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-            >
-              <td className="py-2">
-                <input
-                  type="checkbox"
-                  checked={selectedProducts.includes(prod.id)}
-                  onChange={() => handleCheckboxChange(prod.id)}
-                />
-              </td>
-              <td className="py-2">{prod.name}</td>
-              <td className="py-2">{prod.categoryName}</td>
-              <td className="py-2">${prod.price}</td>
-              <td className="py-2">{prod.quantity}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Pagination Controls */}
-      <div className="flex justify-center mt-6 space-x-4">
-        {hasPrevPage && (
-          <button
-            className="flex items-center gap-2 text-green-600 font-semibold hover:text-green-800 transition duration-300"
-            onClick={loadPrevPage}
-          >
-            &larr; Prev Page
-          </button>
-        )}
-        {hasNextPage && (
-          <button
-            className="flex items-center gap-2 text-green-600 font-semibold hover:text-green-800 transition duration-300"
-            onClick={loadNextPage}
-          >
-            Next Page &rarr;
-          </button>
-        )}
-      </div>
-    </div>
-  );
+    );
 }
