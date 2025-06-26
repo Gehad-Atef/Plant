@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useTheme } from "../../../context/ThemeProvider";
 
 export default function CategoryPage() {
+    const { darkMode } = useTheme();
     const [categories, setCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [showAddPopup, setShowAddPopup] = useState(false);
@@ -124,7 +126,11 @@ export default function CategoryPage() {
     };
 
     return (
-        <div className="p-4 sm:p-6 rounded-lg shadow bg-white text-black max-w-6xl mx-auto">
+        <div
+            className={`p-4 sm:p-6 rounded-lg shadow transition-colors duration-300 ${
+                darkMode ? "bg-gray-900 text-gray-100" : "bg-white text-black"
+            } max-w-6xl mx-auto`}
+        >
             {/* Header & Actions */}
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
                 <h2 className="text-xl font-semibold">All Categories</h2>
@@ -276,7 +282,7 @@ export default function CategoryPage() {
                         {categories.map((cat) => (
                             <tr
                                 key={cat.id}
-                                className="border-b hover:bg-gray-50 transition"
+                                className="border-b hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800 transition"
                             >
                                 <td className="py-2 px-2">
                                     <input

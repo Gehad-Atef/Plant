@@ -8,19 +8,19 @@ import {
     FaClipboardList,
 } from "react-icons/fa";
 import { useTheme } from "../../../context/ThemeProvider";
-import { useUserContext } from "../../../context/UserProvider"; // ✅ ضيفي الاستيراد ده
+import { useUserContext } from "../../../context/UserProvider";
 import { useNavigate } from "react-router-dom";
 
 export default function Sidebar() {
     const { pathname } = useLocation();
     const { darkMode } = useTheme();
-    // const { logout } = useUserContext(); // ✅ استخدمي logout من الكونتكست
+    // const { logout } = useUserContext();
     const navigate = useNavigate();
     const { logout } = useUserContext();
 
     const handleLogout = () => {
-        logout(); // يمسح بيانات المستخدم من السياق
-        navigate("/"); // يرجع للـ Home
+        logout();
+        navigate("/");
     };
 
     const isActive = (path) =>
