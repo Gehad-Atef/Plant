@@ -38,21 +38,28 @@ function PlantDiseaseDetector() {
     if (!image || loading) return;
 
     const formData = new FormData();
-    formData.append("file", image); // ✅ اسم الحقل يجب أن يكون "file"
+    formData.append("file", image); // ✅ بدل "image"
+
+    console.log("📸 Selected image:", image);
+    console.log("📝 File name:", image?.name);
+    console.log("📦 FormData entries:");
+
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
 
     try {
       setLoading(true);
+
       const response = await axios.post(
         "https://localhost:7286/plantdetection/detect",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        formData
+        // ❌ مفيش headers هنا، خلي Axios يضبط Content-Type بنفسه
       );
 
       const data = response.data;
+
+      console.log("✅ Response from fetch:", data);
 
       if (data.success) {
         setResult(data.data);
@@ -61,8 +68,8 @@ function PlantDiseaseDetector() {
         toast.error(data.message || "Detection failed");
       }
     } catch (error) {
-      console.error("Prediction failed:", error);
-      toast.error("Prediction failed. Please try again.");
+      console.error("Prediction failed:", error.response?.data);
+      toast.error(error.response?.data?.message || "Prediction failed");
     } finally {
       setLoading(false);
     }
