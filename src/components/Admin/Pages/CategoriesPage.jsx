@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useTheme } from "../../../context/ThemeProvider"; // ✅ أضفنا السطر ده
 
 export default function CategoryPage() {
   const [categories, setCategories] = useState([]);
@@ -12,6 +13,8 @@ export default function CategoryPage() {
     description: "",
     imageFile: null,
   });
+
+  const { darkMode } = useTheme();
 
   const fetchCategories = () => {
     axios
@@ -120,7 +123,11 @@ export default function CategoryPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 rounded-lg shadow bg-white text-black max-w-6xl mx-auto">
+    <div
+      className={`p-4 sm:p-6 rounded-lg shadow max-w-6xl mx-auto transition ${
+        darkMode ? "bg-gray-900 text-white" : "bg-white text-black"
+      }`}
+    >
       {/* Header & Actions */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
         <h2 className="text-xl font-semibold">All Categories</h2>
@@ -153,12 +160,21 @@ export default function CategoryPage() {
       {/* Add Category Popup */}
       {showAddPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg w-[90%] md:w-[500px] max-h-[90vh] overflow-y-auto">
+          <div
+            className={`p-6 rounded-lg w-[90%] md:w-[500px] max-h-[90vh] overflow-y-auto ${
+              darkMode ? "bg-gray-800 text-white" : "bg-white text-black"
+            }`}
+          >
             <h3 className="text-xl font-bold mb-4">Add Category</h3>
+
             <input
               type="text"
               placeholder="Name"
-              className="border rounded px-4 py-2 mb-3 w-full"
+              className={`border rounded px-4 py-2 mb-3 w-full outline-none transition ${
+                darkMode
+                  ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+                  : "bg-white text-black border-gray-300 placeholder-gray-500"
+              }`}
               value={newCategory.name}
               onChange={(e) =>
                 setNewCategory({
@@ -167,9 +183,14 @@ export default function CategoryPage() {
                 })
               }
             />
+
             <textarea
               placeholder="Description"
-              className="border rounded px-4 py-6 mb-3 w-full"
+              className={`border rounded px-4 py-2 mb-3 w-full outline-none transition ${
+                darkMode
+                  ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+                  : "bg-white text-black border-gray-300 placeholder-gray-500"
+              }`}
               value={newCategory.description}
               onChange={(e) =>
                 setNewCategory({
@@ -178,9 +199,12 @@ export default function CategoryPage() {
                 })
               }
             />
+
             <input
               type="file"
-              className="mb-4"
+              className={`mb-4 file:cursor-pointer ${
+                darkMode ? "text-white" : "text-black"
+              }`}
               onChange={(e) =>
                 setNewCategory({
                   ...newCategory,
@@ -188,9 +212,10 @@ export default function CategoryPage() {
                 })
               }
             />
+
             <div className="flex justify-end gap-2">
               <button
-                className="px-4 py-2 bg-gray-300 rounded"
+                className="px-4 py-2 bg-gray-400 hover:bg-gray-400 rounded"
                 onClick={() => {
                   setShowAddPopup(false);
                   setNewCategory({
@@ -203,7 +228,7 @@ export default function CategoryPage() {
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-green-500 text-white rounded"
+                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
                 onClick={handleAddCategory}
               >
                 Add
@@ -216,11 +241,20 @@ export default function CategoryPage() {
       {/* Edit Category Popup */}
       {editingCategory && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg w-[90%] md:w-[500px] max-h-[90vh] overflow-y-auto">
+          <div
+            className={`p-6 rounded-lg w-[90%] md:w-[500px] max-h-[90vh] overflow-y-auto ${
+              darkMode ? "bg-gray-800 text-white" : "bg-white text-black"
+            }`}
+          >
             <h3 className="text-xl font-bold mb-4">Edit Category</h3>
+
             <input
               type="text"
-              className="border rounded px-4 py-2 mb-3 w-full"
+              className={`border rounded px-4 py-2 mb-3 w-full outline-none transition ${
+                darkMode
+                  ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+                  : "bg-white text-black border-gray-300 placeholder-gray-500"
+              }`}
               value={editingCategory.name}
               onChange={(e) =>
                 setEditingCategory({
@@ -228,9 +262,15 @@ export default function CategoryPage() {
                   name: e.target.value,
                 })
               }
+              placeholder="Name"
             />
+
             <textarea
-              className="border rounded px-4 py-6 mb-3 w-full"
+              className={`border rounded px-4 py-2 mb-3 w-full outline-none transition ${
+                darkMode
+                  ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+                  : "bg-white text-black border-gray-300 placeholder-gray-500"
+              }`}
               value={editingCategory.description}
               onChange={(e) =>
                 setEditingCategory({
@@ -238,16 +278,18 @@ export default function CategoryPage() {
                   description: e.target.value,
                 })
               }
+              placeholder="Description"
             />
+
             <div className="flex justify-end gap-2">
               <button
-                className="px-4 py-2 bg-gray-300 rounded"
+                className="px-4 py-2 bg-gray-400 hover:bg-gray-400 rounded"
                 onClick={() => setEditingCategory(null)}
               >
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-blue-500 text-white rounded"
+                className="px-4 py-2 bg-green-500 hover:bg-blue-600 text-white rounded"
                 onClick={handleEditCategory}
               >
                 Done
@@ -261,14 +303,25 @@ export default function CategoryPage() {
       <div className="overflow-x-auto">
         <table className="w-full table-auto mt-4">
           <thead>
-            <tr className="text-left border-b">
+            <tr
+              className={`text-left border-b ${
+                darkMode ? "border-gray-700" : ""
+              }`}
+            >
               <th className="py-2 px-2"></th>
               <th className="py-2 px-2">Name</th>
             </tr>
           </thead>
           <tbody>
             {categories.map((cat) => (
-              <tr key={cat.id} className="border-b hover:bg-gray-50 transition">
+              <tr
+                key={cat.id}
+                className={`border-b transition ${
+                  darkMode
+                    ? "border-gray-700 hover:bg-gray-800"
+                    : "hover:bg-gray-50"
+                }`}
+              >
                 <td className="py-2 px-2">
                   <input
                     type="checkbox"

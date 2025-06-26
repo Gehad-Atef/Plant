@@ -210,13 +210,21 @@ export default function ProductsPage() {
       {/* Add Product Popup */}
       {showAddPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg p-6 w-[90%] md:w-[600px] space-y-4">
+          <div
+            className={`rounded-lg p-6 w-[90%] md:w-[600px] space-y-4 ${
+              darkMode ? "bg-gray-800 text-white" : "bg-white text-black"
+            }`}
+          >
             <h3 className="text-xl font-bold mb-4">Add Product</h3>
             <div className="grid grid-cols-1 gap-4">
               <input
                 type="text"
                 placeholder="Name"
-                className="border rounded px-4 py-2"
+                className={`border rounded px-4 py-2 outline-none transition ${
+                  darkMode
+                    ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+                    : "bg-white text-black border-gray-300 placeholder-gray-500"
+                }`}
                 value={newProduct.name}
                 onChange={(e) =>
                   setNewProduct({
@@ -228,7 +236,11 @@ export default function ProductsPage() {
               <input
                 type="number"
                 placeholder="Price"
-                className="border rounded px-4 py-2"
+                className={`border rounded px-4 py-2 outline-none transition ${
+                  darkMode
+                    ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+                    : "bg-white text-black border-gray-300 placeholder-gray-500"
+                }`}
                 value={newProduct.price}
                 onChange={(e) =>
                   setNewProduct({
@@ -239,7 +251,11 @@ export default function ProductsPage() {
               />
               <textarea
                 placeholder="Description"
-                className="border rounded px-4 py-4 p-0"
+                className={`border rounded px-4 py-2 outline-none transition ${
+                  darkMode
+                    ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+                    : "bg-white text-black border-gray-300 placeholder-gray-500"
+                }`}
                 value={newProduct.description}
                 onChange={(e) =>
                   setNewProduct({
@@ -250,7 +266,11 @@ export default function ProductsPage() {
               />
               <textarea
                 placeholder="How To Plant"
-                className="border rounded px-4 py-4"
+                className={`border rounded px-4 py-2 outline-none transition ${
+                  darkMode
+                    ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+                    : "bg-white text-black border-gray-300 placeholder-gray-500"
+                }`}
                 value={newProduct.how_To_Plant}
                 onChange={(e) =>
                   setNewProduct({
@@ -262,7 +282,11 @@ export default function ProductsPage() {
               <input
                 type="number"
                 placeholder="Quantity"
-                className="border rounded px-4 py-2"
+                className={`border rounded px-4 py-2 outline-none transition ${
+                  darkMode
+                    ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+                    : "bg-white text-black border-gray-300 placeholder-gray-500"
+                }`}
                 value={newProduct.quantity}
                 onChange={(e) =>
                   setNewProduct({
@@ -272,7 +296,11 @@ export default function ProductsPage() {
                 }
               />
               <select
-                className="border rounded px-4 py-2"
+                className={`border rounded px-4 py-2 outline-none transition ${
+                  darkMode
+                    ? "bg-gray-700 text-white border-gray-600"
+                    : "bg-white text-black border-gray-300"
+                }`}
                 value={newProduct.categoryId}
                 onChange={(e) =>
                   setNewProduct({
@@ -290,7 +318,9 @@ export default function ProductsPage() {
               </select>
               <input
                 type="file"
-                className="border rounded px-4 py-2"
+                className={`border rounded px-4 py-2 file:cursor-pointer ${
+                  darkMode ? "text-white" : "text-black"
+                }`}
                 onChange={(e) =>
                   setNewProduct({
                     ...newProduct,
@@ -313,13 +343,13 @@ export default function ProductsPage() {
                     imageFile: null,
                   });
                 }}
-                className="bg-gray-300 px-4 py-2 rounded"
+                className="bg-gray-400 hover:bg-gray-400 px-4 py-2 rounded"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddProduct}
-                className="bg-green-500 text-white px-4 py-2 rounded"
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
               >
                 Add Product
               </button>
@@ -327,15 +357,24 @@ export default function ProductsPage() {
           </div>
         </div>
       )}
+
       {editingProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg p-6 w-[90%] md:w-[600px] space-y-4">
+          <div
+            className={`rounded-lg p-6 w-[90%] md:w-[600px] space-y-4 ${
+              darkMode ? "bg-gray-800 text-white" : "bg-white text-black"
+            }`}
+          >
             <h3 className="text-xl font-bold mb-4">Edit Product</h3>
             <div className="grid grid-cols-1 gap-4">
               <input
                 type="text"
                 placeholder="Name"
-                className="border rounded px-4 py-2"
+                className={`border rounded px-4 py-2 outline-none transition ${
+                  darkMode
+                    ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+                    : "bg-white text-black border-gray-300 placeholder-gray-500"
+                }`}
                 value={editingProduct.name}
                 onChange={(e) =>
                   setEditingProduct({
@@ -347,7 +386,11 @@ export default function ProductsPage() {
               <input
                 type="number"
                 placeholder="Price"
-                className="border rounded px-4 py-2"
+                className={`border rounded px-4 py-2 outline-none transition ${
+                  darkMode
+                    ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+                    : "bg-white text-black border-gray-300 placeholder-gray-500"
+                }`}
                 value={editingProduct.price}
                 onChange={(e) =>
                   setEditingProduct({
@@ -358,7 +401,11 @@ export default function ProductsPage() {
               />
               <textarea
                 placeholder="Description"
-                className="border rounded px-4 py-8"
+                className={`border rounded px-4 py-2 outline-none transition ${
+                  darkMode
+                    ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+                    : "bg-white text-black border-gray-300 placeholder-gray-500"
+                }`}
                 value={editingProduct.description}
                 onChange={(e) =>
                   setEditingProduct({
@@ -369,7 +416,11 @@ export default function ProductsPage() {
               />
               <textarea
                 placeholder="How To Plant"
-                className="border rounded px-4 py-8"
+                className={`border rounded px-4 py-2 outline-none transition ${
+                  darkMode
+                    ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+                    : "bg-white text-black border-gray-300 placeholder-gray-500"
+                }`}
                 value={editingProduct.how_To_Plant}
                 onChange={(e) =>
                   setEditingProduct({
@@ -381,7 +432,11 @@ export default function ProductsPage() {
               <input
                 type="number"
                 placeholder="Quantity"
-                className="border rounded px-4 py-2"
+                className={`border rounded px-4 py-2 outline-none transition ${
+                  darkMode
+                    ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400"
+                    : "bg-white text-black border-gray-300 placeholder-gray-500"
+                }`}
                 value={editingProduct.quantity}
                 onChange={(e) =>
                   setEditingProduct({
@@ -391,7 +446,11 @@ export default function ProductsPage() {
                 }
               />
               <select
-                className="border rounded px-4 py-2"
+                className={`border rounded px-4 py-2 outline-none transition ${
+                  darkMode
+                    ? "bg-gray-700 text-white border-gray-600"
+                    : "bg-white text-black border-gray-300"
+                }`}
                 value={
                   editingProduct.categoryId
                     ? editingProduct.categoryId.toString()
@@ -433,13 +492,13 @@ export default function ProductsPage() {
             <div className="flex justify-end gap-4 mt-4">
               <button
                 onClick={() => setEditingProduct(null)}
-                className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded"
+                className="bg-gray-400 hover:bg-gray-500 text-black px-4 py-2 rounded"
               >
                 Cancel
               </button>
               <button
                 onClick={handleEditProduct}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                className="bg-green-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
               >
                 Done
               </button>
