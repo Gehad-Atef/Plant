@@ -48,7 +48,14 @@ export const useLogin = () => {
     },
     onError: (error) => {
       console.error("Login Error:", error);
-      toast.error("Login failed! Please check your credentials.");
+
+      const serverMessage =
+        error?.response?.data?.title || // من ToProblem المعدلة
+        error?.response?.data?.message || // fallback لو رجعتيها داخل message
+        error?.response?.data?.errors?.[0]?.description || // fallback من النسخة القديمة
+        "Login failed! Please check your credentials.";
+
+      toast.error(serverMessage);
     },
   });
 };
@@ -74,11 +81,13 @@ export const useRegister = () => {
           messages.forEach((msg) => toast.error(msg));
         });
       } else {
-        // رسالة عامة عند فشل التحقق
-        toast.error(
-          error.response?.data?.message ||
-          "Registration failed. Please check your inputs."
-        );
+        const serverMessage =
+          error?.response?.data?.title ||
+          error?.response?.data?.message ||
+          error?.response?.data?.errors?.[0]?.description ||
+          "Registration failed. Please check your inputs.";
+
+        toast.error(serverMessage);
       }
     },
   });

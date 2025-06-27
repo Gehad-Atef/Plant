@@ -360,7 +360,9 @@ const PlantDetail = () => {
                   max={plant.quantity}
                   value={quantity}
                   onChange={handleQuantityChange}
-                  className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                  className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 
+             rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 
+             bg-white text-black dark:bg-gray-800 dark:text-white"
                 />
               </div>
               <div className="space-x-4">
@@ -390,9 +392,9 @@ const PlantDetail = () => {
                   Add to Cart
                 </button>
 
-                <button className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition duration-300">
+                {/* <button className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition duration-300">
                   Buy Now
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
